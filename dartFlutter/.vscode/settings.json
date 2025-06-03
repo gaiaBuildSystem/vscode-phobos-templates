@@ -1,7 +1,0 @@
-{
-    "torizon_debug_ssh_port": "42270",
-    "torizon_debug_port1": "42271",
-    "torizon_debug_port2": "",
-    "torizon_debug_port3": "",
-    "dart.flutterSdkPath": "/opt/flutter-elinux/flutter"
-}

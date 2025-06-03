@@ -1,2 +1,0 @@
-source .conf/tcb-env-setup.sh -s ${STORAGE_DIR} -t ${TCB_VERSION}
-source ~/.bashrc

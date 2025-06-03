@@ -1,7 +1,0 @@
-{
-    "torizon_debug_ssh_port": "6502",
-    "torizon_debug_port1": "6512",
-    "torizon_debug_port2": "",
-    "torizon_debug_port3": "",
-    "python.defaultInterpreterPath": "./.venv/bin/python3"
-}

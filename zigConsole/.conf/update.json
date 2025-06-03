@@ -1,6 +1,0 @@
-[
-    {
-        "source": "build.zig",
-        "target": "build.zig"
-    }
-]
