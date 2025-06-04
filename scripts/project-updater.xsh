@@ -221,8 +221,8 @@ _templates_metadata_file = open(f"{os.environ['HOME']}/.apollox/templates.json",
 _templates_metadata = json.loads(_templates_metadata_file.read())
 _templates_metadata_file.close()
 
-if "TorizonOSMajor" in _templates_metadata:
-    _templatesJsonTorizonMajor = _templates_metadata["TorizonOSMajor"]
+if "PhobOSMajor" in _templates_metadata:
+    _templatesJsonTorizonMajor = _templates_metadata["PhobOSMajor"]
 else:
     _templatesJsonTorizonMajor = "6"
 
@@ -251,7 +251,7 @@ else:
     _project_metadata = {
         "templateName": f"{_dot_template}",
         "containerName": f"{_dot_container}",
-        "torizonOSMajor": f"{_torizonOSMajor}"
+        "PhobOSMajor": f"{_PhobOSMajor}"
     }
 
     # save the metadata
@@ -263,7 +263,7 @@ else:
     rm -f @(f"{project_folder}/.conf/.template")
     rm -f @(f"{project_folder}/.conf/.container")
 
-_torizonOSMajor = _project_metadata["torizonOSMajor"]
+_PhobOSMajor = _project_metadata["PhobOSMajor"]
 _template_name = _project_metadata['templateName']
 
 # support to update the custom fields
@@ -272,14 +272,14 @@ _custom_fields = []
 if _has_custom_fields:
     _custom_fields = _project_metadata['customFields']
 
-# signalize if the user is under a torizonOSMajor not 7
-if _torizonOSMajor != "7":
+# signalize if the user is under a PhobOSMajor not 7
+if _PhobOSMajor != "7":
     print(
         "The latest Torizon OS major version is 7",
         color=Color.YELLOW
     )
     print(
-        f"But your templates repository is using the major version {_torizonOSMajor}.",
+        f"But your templates repository is using the major version {_PhobOSMajor}.",
         color=Color.YELLOW
     )
     print(
@@ -288,9 +288,9 @@ if _torizonOSMajor != "7":
     )
 
 # make sure to accept a major version update
-if _torizonOSMajor != _templatesJsonTorizonMajor:
+if _PhobOSMajor != _templatesJsonTorizonMajor:
     print(
-        f"Your template is on Torizon OS major version {_torizonOSMajor} and you are updating it to a template in Torizon OS major version {_templatesJsonTorizonMajor}",
+        f"Your template is on Torizon OS major version {_PhobOSMajor} and you are updating it to a template in Torizon OS major version {_templatesJsonTorizonMajor}",
         color=Color.RED
     )
 

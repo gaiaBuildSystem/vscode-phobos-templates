@@ -271,7 +271,7 @@ _proj_metadata_json = {
     "projectName": project_name,
     "templateName": template,
     "containerName": container_name,
-    "torizonOSMajor": _metadata["TorizonOSMajor"],
+    "PhobOSMajor": _metadata["PhobOSMajor"],
     "hasCustomFields": _has_custom_fields,
     "customFields": _custom_fields
 }
