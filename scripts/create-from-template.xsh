@@ -229,6 +229,10 @@ cp -r @(template_folder)/../scripts/validate-deps-running.xsh @(new_project_path
 cp -r @(template_folder)/../scripts/apply-ci-settings-file.xsh @(new_project_path)/.conf/
 cp -r @(template_folder)/../scripts/validate-json.xsh @(new_project_path)/.conf/
 
+# also create the .opus
+mkdir -p @(new_project_path)/.opus
+cp -r @(template_folder)/../assets/schemas/custom.schema.json @(new_project_path)/.opus/custom.schema.json
+
 
 template_name = os.path.basename(template_folder)
 
