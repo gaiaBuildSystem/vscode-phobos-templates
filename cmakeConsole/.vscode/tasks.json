@@ -53,7 +53,7 @@
             "options": {
                 "env": {
                     "PHOBOS_IP": "${config:torizon_ip}",
-                    "PHOBOS_PORT": "${config:torizon_debug_ssh_port}",
+                    "PHOBOS_PORT": "${config:torizon_debug_ssh_port}"
                 }
             },
             "dependsOrder": "sequence",
