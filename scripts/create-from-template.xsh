@@ -228,6 +228,7 @@ cp -r @(template_folder)/../scripts/check-ci-env.xsh @(new_project_path)/.conf/
 cp -r @(template_folder)/../scripts/validate-deps-running.xsh @(new_project_path)/.conf/
 cp -r @(template_folder)/../scripts/apply-ci-settings-file.xsh @(new_project_path)/.conf/
 cp -r @(template_folder)/../scripts/validate-json.xsh @(new_project_path)/.conf/
+cp -r @(template_folder)/../assets/json/torizonPackages.json @(new_project_path)/
 
 # also create the .opus
 mkdir -p @(new_project_path)/.opus
