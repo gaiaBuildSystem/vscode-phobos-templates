@@ -84,3 +84,6 @@ build-*
 
 .conf/.depok
 .conf/.docok
+
+.opus/apt
+.opus/binfmt

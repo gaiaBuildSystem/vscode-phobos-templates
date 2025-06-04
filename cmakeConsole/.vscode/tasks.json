@@ -16,181 +16,49 @@
             "icon": {
                 "id": "tools",
                 "color": "terminal.ansiYellow"
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "group": "build-execution"
-            }
-        },
-        {
-            "label": "build-configure-arm",
-            "hide": true,
-            "command": "DOCKER_HOST=",
-            "type": "shell",
-            "args": [
-                "docker",
-                "run",
-                "--rm",
-                "-v",
-                "${workspaceFolder}:${config:torizon_app_root}",
-                "cross-toolchain-arm-__container__",
-                "cmake",
-                "-DCMAKE_BUILD_TYPE=Debug",
-                "-DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++",
-                "-DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc",
-                "-Bbuild-arm"
-            ],
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "dependsOrder": "sequence",
-            "dependsOn": [
-                "build-container-image-sdk-arm"
-            ],
-            "icon": {
-                "id": "tools",
-                "color": "terminal.ansiYellow"
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "group": "build-execution"
-            }
-        },
-        {
-            "label": "build-configure-arm64",
-            "hide": true,
-            "command": "DOCKER_HOST=",
-            "type": "shell",
-            "args": [
-                "docker",
-                "run",
-                "--rm",
-                "-v",
-                "${workspaceFolder}:${config:torizon_app_root}",
-                "cross-toolchain-arm64-__container__",
-                "cmake",
-                "-DCMAKE_BUILD_TYPE=Debug",
-                "-DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++",
-                "-DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc",
-                "-Bbuild-arm64"
-            ],
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "dependsOrder": "sequence",
-            "dependsOn": [
-                "build-container-image-sdk-arm64"
-            ],
-            "icon": {
-                "id": "tools",
-                "color": "terminal.ansiYellow"
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "group": "build-execution"
             }
         },
         {
             "label": "build-debug-local",
             "detail": "Build a debug version of the application for amd64 using\nthe toolchain installed in the host.",
+            "group": "build",
             "command": "cmake",
             "type": "shell",
             "args": [
                 "--build",
                 "${workspaceFolder}/build-local"
             ],
-            "problemMatcher": [
-                "$gcc"
-            ],
             "dependsOrder": "sequence",
             "dependsOn": [
                 "build-configure-local"
             ],
-            "icon": {
-                "id": "tools",
-                "color": "terminal.ansiYellow"
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "group": "build-execution"
-            }
-        },
-        {
-            "label": "build-debug-arm64",
-            "detail": "Build a debug version of the application for arm64 using\nthe toolchain from the SDK container.",
-            "command": "DOCKER_HOST=",
-            "type": "shell",
-            "args": [
-                "docker",
-                "run",
-                "--rm",
-                "-v",
-                "${workspaceFolder}:${config:torizon_app_root}",
-                "cross-toolchain-arm64-__container__",
-                "cmake",
-                "--build",
-                "build-arm64"
-            ],
             "problemMatcher": [
                 "$gcc"
             ],
-            "dependsOrder": "sequence",
-            "dependsOn": [
-                "build-configure-arm64"
-            ],
             "icon": {
                 "id": "tools",
                 "color": "terminal.ansiYellow"
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "group": "build-execution"
             }
         },
         {
-            "label": "deploy-torizon-arm64",
+            "label": "apply-phobos-packages-arch",
             "detail": "",
             "hide": true,
-            "command": "rsync",
+            "command": "xonsh",
             "type": "process",
             "args": [
-                "-P",
-                "-av",
-                "-e",
-                "ssh -p ${config:torizon_debug_ssh_port} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null",
-                "${workspaceFolder}/build-arm64/bin/",
-                "${config:torizon_run_as}@${config:torizon_ip}:${config:torizon_app_root}"
+                "${workspaceFolder}/.conf/torizon-packages.xsh",
+                "${config:torizon_arch}"
             ],
-            "dependsOn": [
-                "validate-settings",
-                "validate-arch-arm64",
-                "copy-docker-compose",
-                "pre-cleanup",
-                "build-debug-arm64",
-                "build-container-torizon-debug-arm64",
-                "push-container-torizon-debug-arm64",
-                "pull-container-torizon-debug-arm64",
-                "run-container-torizon-debug-arm64"
-            ],
+            "options": {
+                "env": {
+                    "PHOBOS_IP": "${config:torizon_ip}",
+                    "PHOBOS_PORT": "${config:torizon_debug_ssh_port}",
+                }
+            },
             "dependsOrder": "sequence",
-            "problemMatcher": "$msCompile",
             "icon": {
-                "id": "debug-alt",
+                "id": "gear",
                 "color": "terminal.ansiYellow"
             },
             "presentation": {
@@ -202,8 +70,44 @@
             }
         },
         {
-            "label": "build-debug-arm",
-            "detail": "Build a debug version of the application for armhf using\nthe toolchain from the SDK container.",
+            "label": "build-container-image-sdk-arch",
+            "detail": "",
+            "hide": true,
+            "group": "build",
+            "command": "DOCKER_HOST=",
+            "type": "shell",
+            "args": [
+                "docker",
+                "build",
+                "--pull",
+                "-f",
+                "${workspaceFolder}/Dockerfile.sdk",
+                "${workspaceFolder}",
+                "-t",
+                "cross-toolchain-c-console",
+                "--build-arg",
+                "IMAGE_ARCH=${config:torizon_arch}",
+                "--build-arg",
+                "GPU=${config:torizon_gpu}",
+                "--build-arg",
+                "APP_ROOT=${config:torizon_app_root}"
+            ],
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "apply-phobos-packages-arch"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "icon": {
+                "id": "tools",
+                "color": "terminal.ansiYellow"
+            }
+        },
+        {
+            "label": "build-configure-arch",
+            "hide": true,
+            "group": "build",
             "command": "DOCKER_HOST=",
             "type": "shell",
             "args": [
@@ -212,17 +116,47 @@
                 "--rm",
                 "-v",
                 "${workspaceFolder}:${config:torizon_app_root}",
-                "cross-toolchain-arm-__container__",
+                "cross-toolchain-c-console",
+                "cmake",
+                "-DCMAKE_BUILD_TYPE=Debug",
+                "-DCMAKE_CXX_COMPILER=${config:torizon_arch}-g++",
+                "-DCMAKE_C_COMPILER=${config:torizon_arch}-gcc",
+                "-Bbuild-target"
+            ],
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "build-container-image-sdk-arch"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "icon": {
+                "id": "tools",
+                "color": "terminal.ansiYellow"
+            }
+        },
+        {
+            "label": "build-debug-arch",
+            "detail": "Build a debug version of the application using\nthe toolchain from the SDK container.",
+            "command": "DOCKER_HOST=",
+            "type": "shell",
+            "args": [
+                "docker",
+                "run",
+                "--rm",
+                "-v",
+                "${workspaceFolder}:${config:torizon_app_root}",
+                "cross-toolchain-c-console",
                 "cmake",
                 "--build",
-                "build-arm"
+                "build-target"
             ],
             "problemMatcher": [
                 "$gcc"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
-                "build-configure-arm"
+                "build-configure-arch"
             ],
             "icon": {
                 "id": "tools",
@@ -237,144 +171,26 @@
             }
         },
         {
-            "label": "deploy-torizon-arm",
-            "detail": "",
-            "hide": true,
-            "command": "rsync",
-            "type": "process",
-            "args": [
-                "-P",
-                "-av",
-                "-e",
-                "ssh -p ${config:torizon_debug_ssh_port} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null",
-                "${workspaceFolder}/build-arm/bin/",
-                "${config:torizon_run_as}@${config:torizon_ip}:${config:torizon_app_root}"
-            ],
-            "dependsOn": [
-                "validate-settings",
-                "validate-arch-arm",
-                "copy-docker-compose",
-                "pre-cleanup",
-                "build-debug-arm",
-                "build-container-torizon-debug-arm",
-                "push-container-torizon-debug-arm",
-                "pull-container-torizon-debug-arm",
-                "run-container-torizon-debug-arm"
-            ],
-            "dependsOrder": "sequence",
-            "problemMatcher": "$msCompile",
-            "icon": {
-                "id": "debug-alt",
-                "color": "terminal.ansiYellow"
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "group": "build-execution"
-            }
-        },
-        {
-            "label": "clean-local",
-            "detail": "Clean the local application build directory.",
-            "command": "cmake",
+            "label": "deploy-phobos",
+            "hide": false,
             "type": "shell",
-            "args": [
-                "--build",
-                "build-local",
-                "--target",
-                "clean"
-            ],
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "icon": {
-                "id": "trash",
-                "color": "terminal.ansiYellow"
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "group": "build-execution"
-            }
-        },
-        {
-            "label": "clean-arm",
-            "detail": "Clean the build folder for armhf using the\ncontainer SDK toolchain.",
+            "group": "build",
             "command": "DOCKER_HOST=",
-            "type": "shell",
             "args": [
-                "docker",
-                "run",
-                "--rm",
-                "-v",
-                "${workspaceFolder}:${config:torizon_app_root}",
-                "cross-toolchain-arm-__container__",
-                "cmake",
-                "--build",
-                "build-arm",
-                "--target",
-                "clean"
-            ],
-            "problemMatcher": [
-                "$gcc"
+                "opus"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
-                "build-container-image-sdk-arm"
-            ],
-            "icon": {
-                "id": "trash",
-                "color": "terminal.ansiYellow"
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "group": "build-execution"
-            }
-        },
-        {
-            "label": "clean-arm64",
-            "detail": "Clean the build folder for arm64 using the\ncontainer SDK toolchain.",
-            "command": "DOCKER_HOST=",
-            "type": "shell",
-            "args": [
-                "docker",
-                "run",
-                "--rm",
-                "-v",
-                "${workspaceFolder}:${config:torizon_app_root}",
-                "cross-toolchain-arm64-__container__",
-                "cmake",
-                "--build",
-                "build-arm64",
-                "--target",
-                "clean"
+                "apply-phobos-packages-arch",
+                "build-debug-arch"
             ],
             "problemMatcher": [
-                "$gcc"
-            ],
-            "dependsOrder": "sequence",
-            "dependsOn": [
-                "build-container-image-sdk-arm64"
+                "$tsc"
             ],
             "icon": {
-                "id": "trash",
-                "color": "terminal.ansiYellow"
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "group": "build-execution"
+                "id": "package"
             }
         }
     ],
-"inputs": []
+    "inputs": []
 }

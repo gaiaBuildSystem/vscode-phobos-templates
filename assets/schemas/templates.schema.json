@@ -1,0 +1,197 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Torizon Templates Configuration",
+    "description": "Schema for Torizon OS templates configuration file",
+    "type": "object",
+    "required": [
+        "PhobOSMajor",
+        "Templates"
+    ],
+    "properties": {
+        "PhobOSMajor": {
+            "type": "string",
+            "description": "Major version of TorizonOS",
+            "pattern": "^[0-9]+$"
+        },
+        "Templates": {
+            "type": "array",
+            "description": "Array of template definitions",
+            "items": {
+                "type": "object",
+                "required": [
+                    "img",
+                    "folder",
+                    "description",
+                    "runtime",
+                    "language",
+                    "multiContainer",
+                    "support",
+                    "status"
+                ],
+                "properties": {
+                    "img": {
+                        "type": "string",
+                        "description": "Image file name for the template"
+                    },
+                    "folder": {
+                        "type": "string",
+                        "description": "Folder name containing the template files"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Human-readable description of the template"
+                    },
+                    "runtime": {
+                        "type": "string",
+                        "description": "Runtime environment for the template"
+                    },
+                    "language": {
+                        "type": "string",
+                        "description": "Programming language used in the template"
+                    },
+                    "debugPort": {
+                        "type": "string",
+                        "description": "Debug port number (optional)"
+                    },
+                    "debugPort2": {
+                        "type": "string",
+                        "description": "Secondary debug port number (optional)"
+                    },
+                    "debugSSHPort": {
+                        "type": "string",
+                        "description": "SSH debug port number (optional)"
+                    },
+                    "multiContainer": {
+                        "type": "boolean",
+                        "description": "Whether the template supports multi-container deployment"
+                    },
+                    "support": {
+                        "type": "string",
+                        "enum": [
+                            "Toradex",
+                            "Community",
+                            "Partner"
+                        ],
+                        "description": "Support level for the template"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "ok",
+                            "deprecated",
+                            "experimental"
+                        ],
+                        "description": "Current status of the template"
+                    },
+                    "customMessage": {
+                        "type": "string",
+                        "description": "Custom message for the template"
+                    },
+                    "tests": {
+                        "type": "object",
+                        "description": "Test configuration for the template",
+                        "properties": {
+                            "debuggers": {
+                                "type": "object",
+                                "description": "Debugger configurations for different architectures",
+                                "properties": {
+                                    "local": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "description": "Local debugger configurations"
+                                    },
+                                    "amd64": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "description": "AMD64 architecture debugger configurations"
+                                    },
+                                    "arm": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "description": "ARM32 architecture debugger configurations"
+                                    },
+                                    "arm64": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "description": "ARM64 architecture debugger configurations"
+                                    }
+                                },
+                                "additionalProperties": false
+                            },
+                            "debuggerConsole": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "description": "Console type for debugging"
+                            },
+                            "mainFile": {
+                                "type": "string",
+                                "description": "Main file for the template"
+                            },
+                            "mainFileBreakpointLine": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "description": "Line number for setting breakpoint in main file"
+                            },
+                            "successDebugMessage": {
+                                "type": "string",
+                                "description": "Expected message indicating successful debug session"
+                            },
+                            "webTemplatePort": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 65535,
+                                "description": "Port number for web-based templates"
+                            },
+                            "tasks": {
+                                "type": "object",
+                                "description": "Task configurations for testing"
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "mergeCommon": {
+                        "type": "object",
+                        "description": "Common merge configuration",
+                        "properties": {
+                            "tasks": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "description": "List of common tasks to merge"
+                            },
+                            "inputs": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "description": "List of common inputs to merge"
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "customFields": {
+                        "type": "array",
+                        "description": "Array of custom field definitions",
+                        "items": {
+                            "type": "object",
+                            "description": "Custom field definition"
+                        }
+                    }
+                },
+                "additionalProperties": false
+            }
+        }
+    },
+    "additionalProperties": false
+}

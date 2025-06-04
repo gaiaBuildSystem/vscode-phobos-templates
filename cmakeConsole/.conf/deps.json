@@ -1,7 +1,6 @@
 {
     "packages": [
         "openssh-client",
-        "sshpass",
         "build-essential",
         "cmake",
         "gdb",

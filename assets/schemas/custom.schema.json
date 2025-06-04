@@ -1,0 +1,307 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "image": {
+            "type": "object",
+            "description": "The image configuration object.",
+            "properties": {
+                "machine": {
+                    "type": "string",
+                    "description": "The target machine for the image, e.g., 'rpi5b' for Rasberry Pi 5B."
+                },
+                "version": {
+                    "type": "string",
+                    "pattern": "^\\d+\\.\\d+\\.\\d+$",
+                    "description": "The version of the image, e.g., '0.0.0'."
+                },
+                "increase": {
+                    "type": "string",
+                    "description": "The percentage to increase the image size by.",
+                    "pattern": "^\\d+%$"
+                },
+                "debug": {
+                    "type": "object",
+                    "description": "Enable or disable debug mode. When the debug mode is enable the changes will be set in a connected device.",
+                    "properties": {
+                        "enable": {
+                            "type": "boolean",
+                            "description": "Enable or disable debug mode."
+                        },
+                        "device": {
+                            "type": "object",
+                            "description": "The device to connect to for debugging. This is only used when debug mode is enabled.",
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "description": "The IP address of the device to connect to.",
+                                    "pattern": "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+                                },
+                                "port": {
+                                    "type": "integer",
+                                    "description": "The port to connect to on the device.",
+                                    "minimum": 1,
+                                    "maximum": 65535
+                                }
+                            },
+                            "required": ["ip", "port"],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": ["enable"],
+                    "if": {
+                        "properties": {
+                            "enable": {
+                                "anyOf": [
+                                    { "const": "true" },
+                                    { "const": true }
+                                ]
+                            }
+                        }
+                    },
+                    "then": {
+                        "required": ["device"]
+                    }
+                },
+                "apt": {
+                    "type": "object",
+                    "description": "Options for apt package management. Like install or remove Debian packages.",
+                    "properties": {
+                        "install": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "A list of packages to install via apt."
+                        },
+                        "install_debug":{
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "A list of packages to install via apt but only dependencies for debug mode. These packages will be installed on the connected device."
+                        },
+                        "remove": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "A list of packages to remove via apt."
+                        }
+                    },
+                    "anyOf": [
+                        {
+                            "required": ["install"]
+                        },
+                        {
+                            "required": ["install_debug"]
+                        },
+                        {
+                            "required": ["remove"]
+                        }
+                    ],
+                    "additionalProperties": false
+                },
+                "services": {
+                    "type": "object",
+                    "description": "Options for systemd services. Like enable or disable systemd services.",
+                    "properties": {
+                        "enable": {
+                            "type": "array",
+                            "description": "A list of services to enable.",
+                            "items": {
+                                "type": "string",
+                                "pattern": "^[a-zA-Z0-9@_\\-]+\\.service$"
+                            }
+                        },
+                        "disable": {
+                            "type": "array",
+                            "description": "A list of services to disable.",
+                            "items": {
+                                "type": "string",
+                                "pattern": "^[a-zA-Z0-9@_\\-]+\\.service$"
+                            }
+                        }
+                    },
+                    "anyOf": [
+                        {
+                            "required": ["enable"]
+                        },
+                        {
+                            "required": ["disable"]
+                        }
+                    ],
+                    "additionalProperties": false
+                },
+                "rootfs": {
+                    "type": "object",
+                    "description": "Options for root filesystem modifications. Like merge, remove or chroot scripts.",
+                    "properties": {
+                        "merge": {
+                            "type": "array",
+                            "description": "A list of directories to merge into the root filesystem. The merge stuff need to be inside a local workspace folder called ./rootfs.",
+                            "items": {
+                                "type": "string",
+                                "pattern": "^./rootfs",
+                                "not": {
+                                    "pattern": "^\\./rootfs\\/(home|root|var|opt)(\\/|$)"
+                                }
+                            }
+                        },
+                        "remove": {
+                            "type": "array",
+                            "description": "A list of directories to remove from the root filesystem. The path should be an absolute path from the inside rootfs from image.",
+                            "items": {
+                                "type": "string",
+                                "pattern": "^/"
+                            }
+                        },
+                        "chroot": {
+                            "type": "array",
+                            "description": "A list of scripts to run inside the chroot environment. The scripts need to be inside a local workspace folder.",
+                            "items": {
+                                "type": "string",
+                                "pattern": "^./"
+                            }
+                        },
+                        "copy": {
+                            "type": "array",
+                            "description": "A list of files to copy into the root filesystem. The files need to be inside a local workspace folder.",
+                            "items": {
+                                "type": "string",
+                                "pattern": "^\\./[^:]+:[^:]+$"
+                            }
+                        }
+                    },
+                    "anyOf": [
+                        {
+                            "required": ["merge"]
+                        },
+                        {
+                            "required": ["remove"]
+                        },
+                        {
+                            "required": ["chroot"]
+                        },
+                        {
+                            "required": ["copy"]
+                        }
+                    ],
+                    "additionalProperties": false
+                },
+                "kernel": {
+                    "type": "object",
+                    "description": "Options for kernel modifications. Like kernel command line parameters, device tree blobs or overlays.",
+                    "properties": {
+                        "cmdline": {
+                            "type": "array",
+                            "description": "A list of kernel command line parameters.",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "devicetree": {
+                            "type": "array",
+                            "description": "A list of device tree blobs. These need to be inside a local workspace folder.",
+                            "items": {
+                                "type": "string",
+                                "pattern": "^\\./.*\\.dts$"
+                            }
+                        },
+                        "devicetree_overlays": {
+                            "type": "array",
+                            "description": "A list of device tree blob overlays. These need to be inside a local workspace folder.",
+                            "items": {
+                                "type": "string",
+                                "pattern": "^\\./.*\\.dtso$"
+                            }
+                        },
+                        "config": {
+                            "description": "A list of kernel configuration options to apply. If these are set, the kernel will be built from source.",
+                            "patternProperties": {
+                                "^CONFIG_[A-Z0-9_]+$": {
+                                    "anyOf": [
+                                        { "type": "string", "enum": ["y", "m"] },
+                                        { "type": "string", "pattern": "^[\\w\\-\\.]+$" }
+                                    ]
+                                }
+                            }
+                        },
+                        "out_of_tree_modules": {
+                            "type": "array",
+                            "description": "A list of kernel modules to include. These need to be inside a local workspace folder called ./modules. These modules will be compiled from source.",
+                            "items": {
+                                "type": "string",
+                                "pattern": "^./modules"
+                            }
+                        }
+                    },
+                    "anyOf": [
+                        {
+                            "required": ["cmdline"]
+                        },
+                        {
+                            "required": ["devicetree"]
+                        },
+                        {
+                            "required": ["devicetree-overlays"]
+                        },
+                        {
+                            "required": ["config"]
+                        },
+                        {
+                            "required": ["out_of_tree_modules"]
+                        }
+                    ],
+                    "additionalProperties": false
+                },
+                "security": {
+                    "description": "Options for security configuration. Like hardening options.",
+                    "type": "object",
+                    "properties": {
+                        "hardened": {
+                            "description": "Enable or disable security hardening options. This option need to be set always to create a production image.",
+                            "type": "boolean"
+                        }
+                    },
+                    "required": [
+                        "hardened"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "machine",
+                "version"
+            ],
+            "allOf": [
+                {
+                    "if": {
+                        "required": ["machine", "version"]
+                    },
+                    "then": {
+                        "anyOf": [
+                            {
+                                "required": ["apt"]
+                            },
+                            {
+                                "required": ["rootfs"]
+                            },
+                            {
+                                "required": ["kernel"]
+                            },
+                            {
+                                "required": ["security"]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "additionalProperties": false
+        }
+    },
+    "required": [
+        "image"
+    ],
+    "additionalProperties": false
+}

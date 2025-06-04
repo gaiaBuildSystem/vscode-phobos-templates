@@ -2,7 +2,7 @@
     "PhobOSMajor": "0",
     "Templates": [
         {
-            "img": "cmakeconsole.png",
+            "img": "cmakeconsole.jpg",
             "folder": "cmakeConsole",
             "description": "/C++ CMake Console Application",
             "runtime": "libc",

@@ -232,38 +232,6 @@ cp -r @(template_folder)/../scripts/validate-json.xsh @(new_project_path)/.conf/
 
 template_name = os.path.basename(template_folder)
 
-# torizonPackages.json fixups
-# TCB template does not use it
-if template_name != "tcb":
-    _tor_package_json_file = open(f"{template_folder}/../assets/json/torizonPackages.json", "r")
-    _tor_package_json = json.load(_tor_package_json_file)
-    _tor_package_json_file.close()
-
-    _dockerfile_file = open(f"{template_folder}/Dockerfile", "r")
-    _dockerfile_lines = _dockerfile_file.readlines()
-    _dockerfile_file.close()
-
-    _build_dep_dockerfile = False
-
-    for line in _dockerfile_lines:
-        if "torizon_packages_build" in line:
-            _build_dep_dockerfile = True
-            break
-
-    # the torizonPackages.json comes with the buildDeps, devRuntimeDeps and prodRuntimeDeps
-    # but some templates can not use all of them
-    # so we groom the JSON object to remove the unnecessary keys
-    if not os.path.exists(f"{template_folder}/Dockerfile.sdk"):
-        _tor_package_json.pop("buildDeps")
-
-    if not os.path.exists(f"{template_folder}/Dockerfile.debug"):
-        _tor_package_json.pop("devRuntimeDeps")
-
-    # save the modified JSON object
-    _tor_package_json_file = open(f"{new_project_path}/torizonPackages.json", "w+")
-    _tor_package_json_file.write(json.dumps(_tor_package_json, indent=4))
-    _tor_package_json_file.close()
-
 
 # check .conf/deps.json
 _deps_json_file = open(f"{template_folder}/.conf/deps.json", "r")
@@ -283,22 +251,21 @@ if "installDepsScripts" in _deps_json and len(_deps_json["installDepsScripts"]) 
             cp -r @(template_folder)/../@(_script_source) @(new_project_path)/@(script)
 
 
-# copy the github actions if not exists
-if not os.path.exists(f"{new_project_path}/.github"):
-    mkdir -p @(new_project_path)/.github
-    cp -r @(template_folder)/../assets/github/workflows @(new_project_path)/.github
+# TODO: create the proper CI/CD scripts for PhobOS projects
+# # copy the github actions if not exists
+# if not os.path.exists(f"{new_project_path}/.github"):
+#     mkdir -p @(new_project_path)/.github
+#     cp -r @(template_folder)/../assets/github/workflows @(new_project_path)/.github
 
 
-# copy the .gitlab ci if not exists
-if not os.path.exists(f"{new_project_path}/.gitlab-ci.yml"):
-    cp -r @(template_folder)/../assets/gitlab/.gitlab-ci.yml @(new_project_path)/.gitlab-ci.yml
+# # copy the .gitlab ci if not exists
+# if not os.path.exists(f"{new_project_path}/.gitlab-ci.yml"):
+#     cp -r @(template_folder)/../assets/gitlab/.gitlab-ci.yml @(new_project_path)/.gitlab-ci.yml
 
 # create a metadata.json to store
 # template name
 # container name
 # base TOR used when created
-with open(f"{template_folder}/../.git/ORIG_HEAD", "r") as base_template_repo_hash_file:
-    base_template_repo_hash = base_template_repo_hash_file.read().replace("\n", "")
 
 _proj_metadata_json = {
     "projectName": project_name,
@@ -306,8 +273,7 @@ _proj_metadata_json = {
     "containerName": container_name,
     "torizonOSMajor": _metadata["TorizonOSMajor"],
     "hasCustomFields": _has_custom_fields,
-    "customFields": _custom_fields,
-    "baseTemplateRepoHash": base_template_repo_hash
+    "customFields": _custom_fields
 }
 
 # save the metadata json file

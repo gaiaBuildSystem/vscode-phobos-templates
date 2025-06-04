@@ -846,13 +846,4 @@ print("✅ specific files OK", color=Color.GREEN)
 # clean up tmp
 rm -rf @(f"{project_folder}/.conf/tmp")
 
-# update metadata.json
-with open(f"{os.environ['HOME']}/.apollox/.git/ORIG_HEAD", "r") as base_template_repo_hash_file:
-    base_template_repo_hash = base_template_repo_hash_file.read().replace("\n", "")
-
-with open(f"{project_folder}/.conf/metadata.json", "w") as _project_metadata_file:
-    _project_metadata["baseTemplateRepoHash"] = base_template_repo_hash
-    _project_metadata["torizonOSMajor"] = _templates_metadata["TorizonOSMajor"]
-    _project_metadata_file.write(json.dumps(_project_metadata, indent=4))
-
 print("\n✅ Update done", color=Color.GREEN)
