@@ -122,6 +122,24 @@
             }
         },
         {
+            "label": "show-project-documentation",
+            "detail": "This task will open the project specific documentation\nin a new tab.",
+            "command": "${command:torizon.openTemplateDocumentation}",
+            "type": "process",
+            "dependsOrder": "sequence",
+            "problemMatcher": "$msCompile",
+            "icon": {
+                "id": "book",
+                "color": "terminal.ansiCyan"
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "dedicated"
+            }
+        },
+        {
             "label": "reload-vscode-window",
             "detail": "Reloads this VSCode window (workspace)",
             "command": "${command:workbench.action.reloadWindow}",
