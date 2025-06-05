@@ -180,6 +180,25 @@
                 "panel": "shared",
                 "group": "build-execution"
             }
+        },
+        {
+            "label": "create-production-image",
+            "detail": "This task will run the Opus and will create the custom image.",
+            "hide": false,
+            "type": "shell",
+            "group": "build",
+            "command": "DOCKER_HOST=",
+            "args": [
+                "opus",
+                "--ignore-debug"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": [
+                "$tsc"
+            ],
+            "icon": {
+                "id": "package"
+            }
         }
     ]
 }
