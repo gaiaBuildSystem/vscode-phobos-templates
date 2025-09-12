@@ -7,7 +7,7 @@
             "description": "/C++ CMake Console Application",
             "runtime": "libc",
             "language": "C++",
-            "multiContainer": false,
+            "multiContainer": true,
             "support": "Community",
             "status": "ok"
         },
@@ -17,7 +17,7 @@
             "description": ".NET Avalonia FrameBuffer",
             "runtime": ".NET",
             "language": "C#",
-            "multiContainer": false,
+            "multiContainer": true,
             "support": "Community",
             "status": "ok"
         }
