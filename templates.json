@@ -9,7 +9,9 @@
             "language": "C++",
             "multiContainer": true,
             "support": "Community",
-            "status": "ok"
+            "status": "ok",
+            "customFields": [],
+            "commonAssets": []
         },
         {
             "img": "avaloniafb.jpg",
@@ -19,7 +21,12 @@
             "language": "C#",
             "multiContainer": true,
             "support": "Community",
-            "status": "ok"
+            "status": "ok",
+            "customFields": [],
+            "commonAssets": [
+                "scripts/dotnet/dotnet-build-debug.xsh",
+                "scripts/dotnet/install-vsdbg.sh"
+            ]
         }
     ]
 }

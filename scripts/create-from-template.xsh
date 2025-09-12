@@ -346,6 +346,11 @@ cp -r @(template_folder)/../scripts/project-updater.xsh @(new_project_path)/.con
 if vscode != False:
     replace_tasks_input()
 
+# copy the commonAssets
+print("Checking common assets ...", color=Color.YELLOW)
+for _asset in _template_metadata.get("commonAssets", []):
+    print(f"Copying common asset: {_asset}")
+    cp -r @(f"{template_folder}/../{_asset}") @(new_project_path)/.conf/
 
 print("✅ Renaming file contents ok", color=Color.GREEN)
 

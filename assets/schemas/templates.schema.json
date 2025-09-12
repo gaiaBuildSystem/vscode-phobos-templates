@@ -187,6 +187,13 @@
                             "type": "object",
                             "description": "Custom field definition"
                         }
+                    },
+                    "commonAssets": {
+                        "type": "array",
+                        "description": "Array of common asset names, should be the relative path to the root folder",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 },
                 "additionalProperties": false
