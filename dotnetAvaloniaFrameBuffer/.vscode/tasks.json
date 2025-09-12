@@ -7,6 +7,9 @@
             "hide": true,
             "command": "xonsh",
             "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "args": [
                 "${workspaceFolder}/.conf/dotnet-build-debug.xsh",
                 "${config:torizon_arch}",

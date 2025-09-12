@@ -1,6 +1,6 @@
 #!/usr/bin/env xonsh
 
-# Copyright (c) 2025 Toradex
+# Copyright (c) 2025 MicroHobby
 # SPDX-License-Identifier: MIT
 
 ##
@@ -50,3 +50,7 @@ dotnet \
     -c Debug \
     -r @(_torizon_to_dotnet_map[_torizon_arch]) \
     --self-contained
+
+# copy the content to the root filesystem
+mkdir -p ./rootfs/usr/app
+cp -r ./bin/Debug/net8.0/@(_torizon_to_dotnet_map[_torizon_arch])/publish ./rootfs/usr/app
