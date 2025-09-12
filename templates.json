@@ -14,7 +14,7 @@
                 {
                     "id": "none",
                     "label": "Description",
-                    "placeholder": "Description is optional",
+                    "placeHolder": "Description is optional",
                     "default": "",
                     "type": "text",
                     "validRegex": "^.*$",
@@ -37,7 +37,7 @@
                 {
                     "id": "none",
                     "label": "Description",
-                    "placeholder": "Description is optional",
+                    "placeHolder": "Description is optional",
                     "default": "",
                     "type": "text",
                     "validRegex": "^.*$",
