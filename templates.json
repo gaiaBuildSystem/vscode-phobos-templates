@@ -10,7 +10,18 @@
             "multiContainer": true,
             "support": "Community",
             "status": "ok",
-            "customFields": [],
+            "customFields": [
+                {
+                    "id": "none",
+                    "label": "Description",
+                    "placeholder": "Description is optional",
+                    "default": "",
+                    "type": "text",
+                    "validRegex": "^.*$",
+                    "errorMessage": "Invalid description. Some invalid character?",
+                    "description": "A short description of your project"
+                }
+            ],
             "commonAssets": []
         },
         {
@@ -22,7 +33,18 @@
             "multiContainer": true,
             "support": "Community",
             "status": "ok",
-            "customFields": [],
+            "customFields": [
+                {
+                    "id": "none",
+                    "label": "Description",
+                    "placeholder": "Description is optional",
+                    "default": "",
+                    "type": "text",
+                    "validRegex": "^.*$",
+                    "errorMessage": "Invalid description. Some invalid character?",
+                    "description": "A short description of your project"
+                }
+            ],
             "commonAssets": [
                 "scripts/dotnet/dotnet-build-debug.xsh",
                 "scripts/dotnet/install-vsdbg.sh"
