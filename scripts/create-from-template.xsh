@@ -36,6 +36,8 @@ Usage:
     <template_folder>   The folder where the template that will be used to create
                         the new project is located.
 
+    <folder_name>       The name of the workspace.
+
     <project_name>      The name of the new project.
 
     <container_name>    The name of the container that will be used for the new project.
@@ -70,17 +72,18 @@ _has_custom_fields = False
 _custom_fields = []
 
 template_folder = get_arg_not_empty(1)
-project_name = get_arg_not_empty(2)
-container_name = get_arg_not_empty(3)
-new_project_path = get_arg_not_empty(4)
+folder_name = get_arg_not_empty(2)
+project_name = get_arg_not_empty(3)
+container_name = get_arg_not_empty(4)
+new_project_path = get_arg_not_empty(5)
 
 # get the template_folder name
 _template = Path(template_folder).name
 
 # optional
-template = get_optional_arg(5, _template)
-vscode = get_optional_arg(6, False)
-telemetry = get_optional_arg(7, True)
+template = get_optional_arg(6, _template)
+vscode = get_optional_arg(7, False)
+telemetry = get_optional_arg(8, True)
 
 
 if "--customFields" in sys.argv:
@@ -88,11 +91,13 @@ if "--customFields" in sys.argv:
     _custom_fields = json.loads(sys.argv[sys.argv.index("--customFields") + 1])
 
 # the new_project_path need to be a full path
-new_project_path = f"{new_project_path}/{project_name}"
+new_project_path = f"{new_project_path}/{folder_name}"
+root_path = Path(new_project_path).resolve()
 
 
 print("Data:")
 print(f"\tTemplate Folder: {template_folder}")
+print(f"\tFolder Name: {folder_name}")
 print(f"\tProject Name: {project_name}")
 print(f"\tContainer Name: {container_name}")
 print(f"\tNew Project Path: {new_project_path}")
@@ -274,6 +279,7 @@ if "installDepsScripts" in _deps_json and len(_deps_json["installDepsScripts"]) 
 
 _proj_metadata_json = {
     "projectName": project_name,
+    "folderName": folder_name,
     "templateName": template,
     "containerName": container_name,
     "PhobOSMajor": _metadata["PhobOSMajor"],
