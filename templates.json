@@ -10,6 +10,16 @@
             "multiContainer": false,
             "support": "Community",
             "status": "ok"
+        },
+        {
+            "img": "avaloniafb.jpg",
+            "folder": "dotnetAvaloniaFrameBuffer",
+            "description": ".NET Avalonia FrameBuffer",
+            "runtime": ".NET",
+            "language": "C#",
+            "multiContainer": false,
+            "support": "Community",
+            "status": "ok"
         }
     ]
 }

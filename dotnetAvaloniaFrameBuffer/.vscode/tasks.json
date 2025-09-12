@@ -1,0 +1,75 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "publish-debug-arch",
+            "detail": "",
+            "hide": true,
+            "command": "xonsh",
+            "type": "shell",
+            "args": [
+                "${workspaceFolder}/.conf/dotnet-build-debug.xsh",
+                "${config:torizon_arch}",
+                "${workspaceFolder}/__change__.csproj"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": "$msCompile",
+            "icon": {
+                "id": "flame",
+                "color": "terminal.ansiYellow"
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "group": "build-execution"
+            }
+        },
+        {
+            "label": "deploy-phobos",
+            "hide": false,
+            "type": "shell",
+            "group": "build",
+            "command": "DOCKER_HOST=",
+            "args": [
+                "opus"
+            ],
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "apply-phobos-packages-arch",
+                "publish-debug-arch"
+            ],
+            "problemMatcher": [
+                "$tsc"
+            ],
+            "icon": {
+                "id": "package"
+            }
+        },
+        {
+            "label": "stop-phobos-fb",
+            "detail": "",
+            "hide": true,
+            "command": "ssh",
+            "type": "process",
+            "args": [
+                "-p",
+                "${config:torizon_ssh_port}",
+                "-o",
+                "UserKnownHostsFile=/dev/null",
+                "-o",
+                "StrictHostKeyChecking=no",
+                "root@${config:torizon_ip}",
+                "cat /dev/zero > /dev/fb0 ; true"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": "$msCompile",
+            "icon": {
+                "id": "stop",
+                "color": "terminal.ansiYellow"
+            }
+        }
+    ],
+    "inputs": []
+}

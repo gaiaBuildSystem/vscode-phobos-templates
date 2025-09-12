@@ -156,6 +156,14 @@
                                 "pattern": "^/"
                             }
                         },
+                        "chroot_debug": {
+                            "type": "array",
+                            "description": "A list of scripts to run inside the ssh chroot environment. The scripts need to be inside a local workspace folder.",
+                            "items": {
+                                "type": "string",
+                                "pattern": "^./"
+                            }
+                        },
                         "chroot": {
                             "type": "array",
                             "description": "A list of scripts to run inside the chroot environment. The scripts need to be inside a local workspace folder.",
@@ -179,6 +187,9 @@
                         },
                         {
                             "required": ["remove"]
+                        },
+                        {
+                            "required": ["chroot_debug"]
                         },
                         {
                             "required": ["chroot"]

@@ -1,0 +1,20 @@
+image:
+  machine: undefined
+  version: 0.0.0
+  increase: 40%
+  debug:
+    enable: true
+    device:
+      ip: 0.0.0.0
+      port: 22
+  apt:
+    install:
+      - libinput10
+      - libgbm1
+      - libegl1
+      - libgl1-mesa-dri
+  rootfs:
+    chroot_debug:
+      - ./.conf/install-vsdbg.sh
+    merge:
+      - ./rootfs/usr/app/publish

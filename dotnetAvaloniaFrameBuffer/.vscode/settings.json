@@ -1,0 +1,12 @@
+{
+    "torizon_run_as": "root",
+    "torizon_app_root": "/usr/app",
+    "dotnet.preferCSharpExtension": false,
+    "omnisharp.useModernNet": true,
+    "dotnet.server.useOmnisharp": false,
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.expand": false,
+    "explorer.fileNesting.patterns": {
+        "*.axaml": "$(capture).axaml.cs"
+    }
+}
