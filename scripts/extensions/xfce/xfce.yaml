@@ -21,3 +21,4 @@ image:
       - pair-fb.service
   env:
     - DISPLAY: :0
+    - XAUTHORITY: /root/.Xauthority

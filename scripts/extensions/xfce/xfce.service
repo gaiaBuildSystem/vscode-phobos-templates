@@ -4,10 +4,14 @@ After=network-online.target rc-local.service systemd-user-sessions.service getty
 Wants=network-online.target
 
 [Service]
-Type=exec
-EnvironmentFile=-/etc/environment
+Type=simple
+User=root
+Environment=XAUTHORITY=/root/.Xauthority
 ExecStart=/usr/bin/startxfce4
 Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
