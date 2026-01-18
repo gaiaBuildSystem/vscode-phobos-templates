@@ -226,6 +226,7 @@ cp -r @(template_folder)/../scripts/share-wsl-ports.xsh @(new_project_path)/.con
 cp -r @(template_folder)/../scripts/docker-login.xsh @(new_project_path)/.conf/
 cp -r @(template_folder)/../scripts/create-docker-compose-production.xsh @(new_project_path)/.conf/
 cp -r @(template_folder)/../scripts/torizon-packages.xsh @(new_project_path)/.conf/
+cp -r @(template_folder)/../scripts/merge-extension.xsh @(new_project_path)/.conf/
 cp -r @(template_folder)/../scripts/.vscode/tasks.xsh @(new_project_path)/.vscode/
 cp -r @(template_folder)/../scripts/bash/tcb-env-setup.sh @(new_project_path)/.conf/
 cp -r @(template_folder)/../scripts/torizon-io.xsh @(new_project_path)/.conf/

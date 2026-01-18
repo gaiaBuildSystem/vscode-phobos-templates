@@ -1,8 +1,4 @@
 {
-    "packages": [
-        "openssh-client"
-    ],
-    "installDepsScripts": [
-        ".conf/installDepsScripts/installDotnetSDK8.sh"
-    ]
+    "packages": [],
+    "installDepsScripts": []
 }
