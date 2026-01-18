@@ -6,6 +6,8 @@ image:
     mkdir:
       - /etc/xdg/weston
     copy:
+      # this is commented out, uncomment if kiosk mode required
+      # - ./weston/weston-kiosk.ini:/etc/xdg/weston/weston.ini
       - ./weston/weston.ini:/etc/xdg/weston/weston.ini
       - ./weston/weston.service:/etc/systemd/system/weston.service
   services:
