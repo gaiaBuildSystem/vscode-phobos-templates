@@ -4,7 +4,7 @@
         {
             "img": "opus.jpg",
             "folder": "genericOpus",
-            "description": "Generic Opus Application\nOpus help you customize your PhobOS to be your OS.",
+            "description": "Opus help you customize your PhobOS to be your OS.",
             "runtime": "opus",
             "language": "YAML",
             "multiContainer": false,
