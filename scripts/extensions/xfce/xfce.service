@@ -1,0 +1,13 @@
+[Unit]
+Description=XFCE Desktop Environment
+After=network-online.target rc-local.service systemd-user-sessions.service getty.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+EnvironmentFile=-/etc/environment
+ExecStart=/usr/bin/startxfce4
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

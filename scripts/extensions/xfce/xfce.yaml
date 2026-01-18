@@ -1,0 +1,23 @@
+image:
+  apt:
+    install:
+      - xfce4
+      - xfce4-goodies
+      - xorg
+      - xinit
+      - x11-utils
+  rootfs:
+    mkdir:
+      - /etc/X11/xorg.conf.d
+    copy:
+      # this is commented out, uncomment if kiosk mode required
+      # - ./xfce/xfce4-session.xml:/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml
+      - ./xfce/99-dri-fix.conf:/etc/X11/xorg.conf.d/99-dri-fix.conf
+      - ./xfce/xfce.service:/etc/systemd/system/xfce.service
+  services:
+    enable:
+      - xfce.service
+    disable:
+      - pair-fb.service
+  env:
+    - DISPLAY: 0
