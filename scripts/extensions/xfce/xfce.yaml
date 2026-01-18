@@ -20,4 +20,4 @@ image:
     disable:
       - pair-fb.service
   env:
-    - DISPLAY: 0
+    - DISPLAY: :0
