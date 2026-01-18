@@ -213,6 +213,9 @@
             "type": "process",
             "group": "build",
             "command": "xonsh",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "args": [
                 "${workspaceFolder}/.conf/merge-extension.xsh",
                 "${input:extensionsList}"

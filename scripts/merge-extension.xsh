@@ -22,16 +22,21 @@ from torizon_templates_utils.args import get_arg_not_empty
 from torizon_templates_utils.colors import Color,BgColor,print
 from torizon_templates_utils.errors import Error,Error_Out
 
+# Custom Dumper to properly indent list items
+class IndentDumper(yaml.Dumper):
+    def increase_indent(self, flow=False, indentless=False):
+        return super(IndentDumper, self).increase_indent(flow, False)
+
 _extension_name = get_arg_not_empty(1)
 
 # load the extension configuration
-_extension_path = f"${os.environ['HOME']}/.apollox/scripts/extensions/${_extension_name}"
+_extension_path = f"{os.environ['HOME']}/.apollox/scripts/extensions/{_extension_name}/{_extension_name}.yaml"
 if os.path.exists(_extension_path):
     with open(_extension_path, "r") as _ext_file:
         _ext_config = yaml.safe_load(_ext_file)
 else:
     Error_Out(
-        f"Extension configuration file extensions/{_extension_name}/extension.json not found.",
+        f"Extension configuration file {_extension_path} not found.",
         Error.EINVAL
     )
 
@@ -65,12 +70,28 @@ if os.path.exists("custom.yaml"):
 
     # write back the merged configuration
     with open("custom.yaml", "w") as _custom_yaml:
-        yaml.dump(_yaml_obj, _custom_yaml, default_flow_style=False)
+        yaml.dump(_yaml_obj, _custom_yaml, Dumper=IndentDumper, default_flow_style=False, sort_keys=False)
 
     print(
         f"✅ custom.yaml updated successfully with extension '{_extension_name}'",
         color=Color.GREEN
     )
+
+    # also we need to copy the extension files
+    _extension_files_path = f"{os.environ['HOME']}/.apollox/scripts/extensions/{_extension_name}"
+    if os.path.exists(_extension_files_path):
+        print("Copying extension files ...")
+        cp -r @(f"{_extension_files_path}") .
+
+        print(
+            f"✅ Extension files from '{_extension_name}' copied successfully.",
+            color=Color.GREEN
+        )
+    else:
+        Error_Out(
+            f"No extension files found to copy for '{_extension_name}'",
+            Error.ENOENT
+        )
 else:
     Error_Out(
         "custom.yaml file not found in the current directory.",
