@@ -1,0 +1,9 @@
+image:
+  machine: undefined
+  version: 0.0.0
+  increase: 40%
+  debug:
+    enable: true
+    device:
+      ip: 0.0.0.0
+      port: 22

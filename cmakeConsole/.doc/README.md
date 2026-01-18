@@ -7,8 +7,8 @@ This template leverages from the Torizon IDE extension to provide an easy way to
 <p align="center">
     <img
         alt="PhobOS Logo"
-        src="https://github.com/gaiaBuildSystem/.github/raw/main/profile/PhobOS1.png"
-        width="200"
+        src="https://github.com/gaiaBuildSystem/.github/raw/main/profile/PhobOS3.png"
+        width="300"
     />
 </p>
 

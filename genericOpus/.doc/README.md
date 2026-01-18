@@ -1,6 +1,6 @@
-# .NET 8 C# Avalonia Frame Buffer DRM Template Specific Documentation
+# Generic Opus Application
 
-This template leverages from the Torizon IDE extension to provide an easy way to start a .NET Avalonia Framebuffer project.
+This template leverages from the Torizon IDE extension to provide an easy way to start a PhobOS Opus project.
 
 ## PhobOS
 

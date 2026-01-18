@@ -1,0 +1,14 @@
+
+credentials.zip
+*.lock.yml
+
+#Build directories
+build-*
+#But the build yaml file from ci/cd need to be included
+!.github/workflows/build-*
+
+.conf/.depok
+.conf/.docok
+
+.opus/apt
+.opus/binfmt

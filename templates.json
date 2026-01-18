@@ -2,9 +2,32 @@
     "PhobOSMajor": "0",
     "Templates": [
         {
+            "img": "opus.jpg",
+            "folder": "genericOpus",
+            "description": "Generic Opus Application\nOpus help you customize your PhobOS to be your OS.",
+            "runtime": "opus",
+            "language": "YAML",
+            "multiContainer": false,
+            "support": "Community",
+            "status": "ok",
+            "customFields": [
+                {
+                    "id": "none",
+                    "label": "Description",
+                    "placeHolder": "Description is optional",
+                    "default": "",
+                    "type": "text",
+                    "validRegex": "^.*$",
+                    "errorMessage": "Invalid description. Some invalid character?",
+                    "description": "A short description of your project"
+                }
+            ],
+            "commonAssets": []
+        },
+        {
             "img": "cmakeconsole.jpg",
             "folder": "cmakeConsole",
-            "description": "/C++ CMake Console Application",
+            "description": "C++ CMake Console Application",
             "runtime": "libc",
             "language": "C++",
             "multiContainer": false,
