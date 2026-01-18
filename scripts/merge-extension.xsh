@@ -41,6 +41,29 @@ else:
     )
 
 
+# helper function for deep merging
+def deep_merge(original, new):
+    """Recursively merge new into original, preserving original values"""
+    if isinstance(original, dict) and isinstance(new, dict):
+        result = dict(original)
+        for key, new_value in new.items():
+            if key in result:
+                result[key] = deep_merge(result[key], new_value)
+            else:
+                result[key] = new_value
+        return result
+    elif isinstance(original, list) and isinstance(new, list):
+        # Preserve original list items and add new ones that aren't already there
+        result = list(original)
+        for item in new:
+            if item not in result:
+                result.append(item)
+        return result
+    else:
+        # For scalar values, new value overwrites
+        return new
+
+
 # custom.yaml
 if os.path.exists("custom.yaml"):
     print("Applying to custom.yaml ...")
@@ -48,22 +71,10 @@ if os.path.exists("custom.yaml"):
     with open("custom.yaml", "r") as _custom_yaml:
         _yaml_obj = yaml.safe_load(_custom_yaml)
 
-# now that we have the two
-# merge it
+    # now that we have the two, merge it
     for section in _ext_config:
         if section in _yaml_obj:
-            if isinstance(_yaml_obj[section], list):
-                # append the new items to the list
-                _yaml_obj[section].extend(_ext_config[section])
-            elif isinstance(_yaml_obj[section], dict):
-                # merge the dictionaries
-                _yaml_obj[section].update(_ext_config[section])
-            else:
-                # unsupported type
-                Error_Out(
-                    f"Unsupported type for section '{section}' in custom.yaml.",
-                    Error.EINVAL
-                )
+            _yaml_obj[section] = deep_merge(_yaml_obj[section], _ext_config[section])
         else:
             # add the new section
             _yaml_obj[section] = _ext_config[section]
