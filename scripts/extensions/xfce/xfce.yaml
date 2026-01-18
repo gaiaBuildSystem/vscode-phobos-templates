@@ -6,6 +6,7 @@ image:
       - xorg
       - xinit
       - x11-utils
+      - dbus-x11
   rootfs:
     mkdir:
       - /etc/X11/xorg.conf.d
