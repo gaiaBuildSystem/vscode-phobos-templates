@@ -1,0 +1,17 @@
+[Unit]
+Description=Weston Wayland Compositor
+Documentation=https://wayland.freedesktop.org/weston.html
+After=network-online.target rc-local.service systemd-user-sessions.service getty.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+EnvironmentFile=-/etc/environment
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+ExecStartPre=/bin/mkdir -p /run/user/1000
+ExecStartPre=/bin/chmod 0700 /run/user/1000
+ExecStart=/usr/bin/weston --tty=7
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

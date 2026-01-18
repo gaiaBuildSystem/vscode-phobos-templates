@@ -137,6 +137,14 @@
                     "type": "object",
                     "description": "Options for root filesystem modifications. Like merge, remove or chroot scripts.",
                     "properties": {
+                        "mkdir": {
+                            "type": "array",
+                            "description": "A list of path, it uses mkdir -p, to create into the rootfs. The path should be absolute.",
+                            "items": {
+                                "type": "string",
+                                "pattern": "^/"
+                            }
+                        },
                         "merge": {
                             "type": "array",
                             "description": "A list of directories to merge into the root filesystem. The merge stuff need to be inside a local workspace folder called ./rootfs.",
@@ -265,6 +273,13 @@
                         }
                     ],
                     "additionalProperties": false
+                },
+                "env": {
+                    "type": "array",
+                    "description": "A list of environment variables to set in the image.",
+                    "items": {
+                        "type": "object"
+                    }
                 },
                 "security": {
                     "description": "Options for security configuration. Like hardening options.",

@@ -1,3 +1,12 @@
 {
-    "inputs": []
+    "inputs": [
+        {
+            "id": "extensionsList",
+            "type": "pickString",
+            "description": "Choose a extension to add to your project",
+            "options": [
+                "weston"
+            ]
+        }
+    ]
 }

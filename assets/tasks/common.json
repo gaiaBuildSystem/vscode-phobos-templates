@@ -205,6 +205,25 @@
             "icon": {
                 "id": "package"
             }
+        },
+        {
+            "label": "add-extension",
+            "detail": "This task will add one extension to your project.\nExtensions are features, configurations or tools that need some more steps\n to be added to your project. This will add all that is needed to your project.",
+            "hide": false,
+            "type": "process",
+            "group": "build",
+            "command": "xonsh",
+            "args": [
+                "${workspaceFolder}/.conf/merge-extension.xsh",
+                "${input:extensionsList}"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": [
+                "$tsc"
+            ],
+            "icon": {
+                "id": "package"
+            }
         }
     ]
 }
