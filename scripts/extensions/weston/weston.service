@@ -6,11 +6,10 @@ Wants=network-online.target
 
 [Service]
 Type=exec
-EnvironmentFile=-/etc/environment
-Environment=XDG_RUNTIME_DIR=/run/user/1000
-ExecStartPre=/bin/mkdir -p /run/user/1000
-ExecStartPre=/bin/chmod 0700 /run/user/1000
-ExecStart=/usr/bin/weston --tty=7
+Environment=XDG_RUNTIME_DIR=/run/user/0
+ExecStartPre=/bin/mkdir -p /run/user/0
+ExecStartPre=/bin/chmod 0700 /run/user/0
+ExecStart=/usr/bin/weston
 Restart=on-failure
 
 [Install]

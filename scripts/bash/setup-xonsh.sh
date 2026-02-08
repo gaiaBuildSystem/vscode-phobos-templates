@@ -19,6 +19,7 @@ pipx ensurepath
 pipx inject xonsh distro
 pipx inject xonsh shtab
 pipx inject xonsh pyyaml
+pipx inject xonsh ruamel.yaml
 pipx inject xonsh psutil
 pipx inject xonsh torizon-templates-utils
 pipx inject xonsh GitPython

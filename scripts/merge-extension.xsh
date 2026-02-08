@@ -17,15 +17,15 @@ $RAISE_SUBPROC_ERROR = True
 
 import os
 import json
-import yaml
+from ruamel.yaml import YAML
 from torizon_templates_utils.args import get_arg_not_empty
 from torizon_templates_utils.colors import Color,BgColor,print
 from torizon_templates_utils.errors import Error,Error_Out
 
-# Custom Dumper to properly indent list items
-class IndentDumper(yaml.Dumper):
-    def increase_indent(self, flow=False, indentless=False):
-        return super(IndentDumper, self).increase_indent(flow, False)
+# Initialize YAML with round-trip mode to preserve comments
+yaml = YAML()
+yaml.preserve_quotes = True
+yaml.default_flow_style = False
 
 _extension_name = get_arg_not_empty(1)
 
@@ -33,7 +33,7 @@ _extension_name = get_arg_not_empty(1)
 _extension_path = f"{os.environ['HOME']}/.apollox/scripts/extensions/{_extension_name}/{_extension_name}.yaml"
 if os.path.exists(_extension_path):
     with open(_extension_path, "r") as _ext_file:
-        _ext_config = yaml.safe_load(_ext_file)
+        _ext_config = yaml.load(_ext_file)
 else:
     Error_Out(
         f"Extension configuration file {_extension_path} not found.",
@@ -69,7 +69,7 @@ if os.path.exists("custom.yaml"):
     print("Applying to custom.yaml ...")
 
     with open("custom.yaml", "r") as _custom_yaml:
-        _yaml_obj = yaml.safe_load(_custom_yaml)
+        _yaml_obj = yaml.load(_custom_yaml)
 
     # now that we have the two, merge it
     for section in _ext_config:
@@ -81,7 +81,7 @@ if os.path.exists("custom.yaml"):
 
     # write back the merged configuration
     with open("custom.yaml", "w") as _custom_yaml:
-        yaml.dump(_yaml_obj, _custom_yaml, Dumper=IndentDumper, default_flow_style=False, sort_keys=False)
+        yaml.dump(_yaml_obj, _custom_yaml)
 
     print(
         f"✅ custom.yaml updated successfully with extension '{_extension_name}'",
