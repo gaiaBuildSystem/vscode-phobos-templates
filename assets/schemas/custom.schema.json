@@ -15,6 +15,11 @@
                     "pattern": "^\\d+\\.\\d+\\.\\d+$",
                     "description": "The version of the image, e.g., '0.0.0'."
                 },
+                "image_path": {
+                    "type": "string",
+                    "pattern": "^(/|\\./|\\.\\./)([a-zA-Z0-9._-]+/)*[a-zA-Z0-9._-]+\\.img$",
+                    "description": "Optional path to a local image file. If provided, this image will be used instead of downloading from the server. The path must be either an absolute path (starting with /) or a relative path (starting with ./ or ../). The filename must match the machine name pattern (e.g., rpi5b.img for machine: rpi5b). Only alphanumeric characters, dots, underscores, hyphens, and slashes are allowed."
+                },
                 "increase": {
                     "type": "string",
                     "description": "The percentage to increase the image size by.",
@@ -27,6 +32,10 @@
                         "enable": {
                             "type": "boolean",
                             "description": "Enable or disable debug mode."
+                        },
+                        "commit": {
+                            "type": "boolean",
+                            "description": "Should the debug changes be commited at end? If true this will generate a new OSTree commit at end of the deploy command."
                         },
                         "device": {
                             "type": "object",
@@ -278,7 +287,8 @@
                     "type": "array",
                     "description": "A list of environment variables to set in the image.",
                     "items": {
-                        "type": "object"
+                        "type": "object",
+                        "additionalProperties": {"type": "string"}
                     }
                 },
                 "security": {
