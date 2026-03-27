@@ -10,6 +10,11 @@
                     "type": "string",
                     "description": "The target machine for the image, e.g., 'rpi5b' for Rasberry Pi 5B."
                 },
+                "name": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+                    "description": "The name of the image. This is not optional, and will be used on the ostree package name."
+                },
                 "version": {
                     "type": "string",
                     "pattern": "^\\d+\\.\\d+\\.\\d+$",
@@ -308,12 +313,13 @@
             },
             "required": [
                 "machine",
+                "name",
                 "version"
             ],
             "allOf": [
                 {
                     "if": {
-                        "required": ["machine", "version"]
+                        "required": ["machine", "name", "version"]
                     },
                     "then": {
                         "anyOf": [
