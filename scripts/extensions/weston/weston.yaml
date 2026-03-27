@@ -2,6 +2,7 @@ image:
   apt:
     install:
       - weston
+      - xwayland
   rootfs:
     mkdir:
       - /etc/xdg/weston
@@ -16,5 +17,6 @@ image:
     disable:
       - pair-fb.service
   env:
-    - XDG_RUNTIME_DIR: /run/user/0
+    - XDG_RUNTIME_DIR: /run/weston
     - WAYLAND_DISPLAY: wayland-1
+    - DISPLAY: :0

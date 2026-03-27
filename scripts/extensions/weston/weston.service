@@ -6,10 +6,11 @@ Wants=network-online.target
 
 [Service]
 Type=exec
-Environment=XDG_RUNTIME_DIR=/run/user/0
-ExecStartPre=/bin/mkdir -p /run/user/0
-ExecStartPre=/bin/chmod 0700 /run/user/0
-ExecStart=/usr/bin/weston
+Environment=XDG_RUNTIME_DIR=/run/weston
+UnsetEnvironment=WAYLAND_DISPLAY
+ExecStartPre=/bin/mkdir -p /run/weston
+ExecStartPre=/bin/chmod 0755 /run/weston
+ExecStart=/usr/bin/weston --backend=drm-backend.so --tty=7 --socket=wayland-1
 Restart=on-failure
 
 [Install]
