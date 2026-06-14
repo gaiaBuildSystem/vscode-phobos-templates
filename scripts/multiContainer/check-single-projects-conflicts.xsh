@@ -12,7 +12,7 @@ $UPDATE_OS_ENVIRON = True
 # Get the full log of error
 $XONSH_SHOW_TRACEBACK = True
 # this script should handle the subprocess errors
-$RAISE_SUBPROC_ERROR = False
+$XONSH_SUBPROC_CMD_RAISE_ERROR = False
 
 import os
 import yaml
@@ -316,7 +316,7 @@ def apply_suggestions(suggestions):
                     p["service_ports"][idx] = new_port_str
                 else:
                     p["service_ports"][idx] = f"{new_val}:{new_val}"
-            
+
                 content["services"][service]["ports"][idx] = new_port_str
 
             with open(path, 'w') as f:
