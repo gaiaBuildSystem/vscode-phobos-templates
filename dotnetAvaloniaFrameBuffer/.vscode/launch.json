@@ -30,7 +30,7 @@
                 ],
                 "debuggerPath": "/root/vsdbg/vsdbg"
             },
-            "preLaunchTask": "deploy-phobos",
+            "preLaunchTask": "deploy-phobos-deps",
             "postDebugTask": "stop-phobos-fb"
         }
     ]

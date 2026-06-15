@@ -1,26 +1,6 @@
 {
     "version": "2.0.0",
     "tasks": [
-        {
-            "label": "deploy-phobos",
-            "hide": false,
-            "type": "shell",
-            "group": "build",
-            "command": "DOCKER_HOST=",
-            "args": [
-                "opus"
-            ],
-            "dependsOrder": "sequence",
-            "dependsOn": [
-                "apply-phobos-packages-arch"
-            ],
-            "problemMatcher": [
-                "$tsc"
-            ],
-            "icon": {
-                "id": "package"
-            }
-        }
     ],
     "inputs": []
 }

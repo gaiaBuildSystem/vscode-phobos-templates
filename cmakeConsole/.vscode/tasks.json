@@ -169,27 +169,6 @@
                 "panel": "shared",
                 "group": "build-execution"
             }
-        },
-        {
-            "label": "deploy-phobos",
-            "hide": false,
-            "type": "shell",
-            "group": "build",
-            "command": "DOCKER_HOST=",
-            "args": [
-                "opus"
-            ],
-            "dependsOrder": "sequence",
-            "dependsOn": [
-                "apply-phobos-packages-arch",
-                "build-debug-arch"
-            ],
-            "problemMatcher": [
-                "$tsc"
-            ],
-            "icon": {
-                "id": "package"
-            }
         }
     ],
     "inputs": []

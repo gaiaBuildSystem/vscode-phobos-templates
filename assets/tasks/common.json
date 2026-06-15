@@ -193,12 +193,40 @@
             "hide": false,
             "type": "shell",
             "group": "build",
-            "command": "DOCKER_HOST=",
+            "command": "opus",
             "args": [
-                "opus",
                 "--ignore-debug"
             ],
+            "options": {
+                "env": {
+                    "DOCKER_HOST": ""
+                }
+            },
             "dependsOrder": "sequence",
+            "problemMatcher": [
+                "$tsc"
+            ],
+            "icon": {
+                "id": "package"
+            }
+        },
+         {
+            "label": "deploy-phobos",
+            "hide": false,
+            "type": "shell",
+            "group": "build",
+            "command": "opus",
+            "args": [
+            ],
+            "options": {
+                "env": {
+                    "DOCKER_HOST": ""
+                }
+            },
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "apply-phobos-packages-arch"
+            ],
             "problemMatcher": [
                 "$tsc"
             ],

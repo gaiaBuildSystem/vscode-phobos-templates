@@ -30,17 +30,17 @@
             }
         },
         {
-            "label": "deploy-phobos",
+            "label": "deploy-phobos-deps",
             "hide": false,
             "type": "shell",
             "group": "build",
-            "command": "DOCKER_HOST=",
+            "command": "echo",
             "args": [
-                "opus"
+                "opus ok"
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
-                "apply-phobos-packages-arch",
+                "deploy-phobos",
                 "publish-debug-arch"
             ],
             "problemMatcher": [
