@@ -193,15 +193,11 @@
             "hide": false,
             "type": "shell",
             "group": "build",
-            "command": "${env:HOME}/.local/bin/opus",
+            "command": "DOCKER_HOST=",
             "args": [
+                "${env:HOME}/.local/bin/opus",
                 "--ignore-debug"
             ],
-            "options": {
-                "env": {
-                    "DOCKER_HOST": ""
-                }
-            },
             "dependsOrder": "sequence",
             "problemMatcher": [
                 "$tsc"
@@ -215,8 +211,9 @@
             "hide": false,
             "type": "shell",
             "group": "build",
-            "command": "${env:HOME}/.local/bin/opus",
+            "command": "DOCKER_HOST=",
             "args": [
+                "${env:HOME}/.local/bin/opus"
             ],
             "options": {
                 "env": {
