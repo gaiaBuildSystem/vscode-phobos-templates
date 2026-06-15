@@ -239,7 +239,10 @@ cp -r @(template_folder)/../assets/json/torizonPackages.json @(new_project_path)
 # also create the .opus
 mkdir -p @(new_project_path)/.opus
 # make it accessible to everyone, because some scripts need to write there
-os.chmod(f"{new_project_path}/.opus", 0o666)
+# it seems to be a security vulnerability but it's not
+# .opus will only contain the custom schema and some cache metadata
+# and the permissions is needed to work properly inside the dev container
+os.chmod(f"{new_project_path}/.opus", 0o777)
 cp -r @(template_folder)/../assets/schemas/custom.schema.json @(new_project_path)/.opus/custom.schema.json
 
 
