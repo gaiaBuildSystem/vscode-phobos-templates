@@ -238,6 +238,8 @@ cp -r @(template_folder)/../assets/json/torizonPackages.json @(new_project_path)
 
 # also create the .opus
 mkdir -p @(new_project_path)/.opus
+# make it accessible to everyone, because some scripts need to write there
+os.chmod(f"{new_project_path}/.opus", 0o666)
 cp -r @(template_folder)/../assets/schemas/custom.schema.json @(new_project_path)/.opus/custom.schema.json
 
 
