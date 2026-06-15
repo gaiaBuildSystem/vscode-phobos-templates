@@ -12,14 +12,14 @@
             "status": "ok",
             "customFields": [
                 {
-                    "id": "none",
-                    "label": "Description",
-                    "placeHolder": "Description is optional",
+                    "id": "osPackageName",
+                    "label": "OS Package Name",
+                    "placeHolder": "The OS package name, e.g. my-awesome-os",
                     "default": "",
                     "type": "text",
-                    "validRegex": "^.*$",
-                    "errorMessage": "Invalid description. Some invalid character?",
-                    "description": "A short description of your project"
+                    "validRegex": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+                    "errorMessage": "Invalid OStree package name",
+                    "description": "The name of your OS package"
                 }
             ],
             "commonAssets": []
