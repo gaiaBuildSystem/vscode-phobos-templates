@@ -193,7 +193,7 @@
             "hide": false,
             "type": "shell",
             "group": "build",
-            "command": "opus",
+            "command": "${env:HOME}/.local/bin/opus",
             "args": [
                 "--ignore-debug"
             ],
@@ -215,7 +215,7 @@
             "hide": false,
             "type": "shell",
             "group": "build",
-            "command": "opus",
+            "command": "${env:HOME}/.local/bin/opus",
             "args": [
             ],
             "options": {
