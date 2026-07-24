@@ -76,7 +76,7 @@
         {
             "img": "cog.jpg",
             "folder": "cogBrowser",
-            "description": "Cog is a small single “window” launcher for the WebKit WPE browser",
+            "description": "Cog single DRM “window” launcher for the WebKit",
             "runtime": "opus",
             "language": "YAML",
             "multiContainer": false,
