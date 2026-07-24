@@ -1,0 +1,8 @@
+
+credentials.zip
+*.lock.yml
+
+.conf/.depok
+.conf/.docok
+.opus/apt
+.opus/binfmt

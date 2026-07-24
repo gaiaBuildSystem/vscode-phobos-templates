@@ -1,0 +1,35 @@
+image:
+  machine: undefined
+  name: __osPackageName__
+  version: 0.0.0
+
+  debug:
+    enable: true
+    commit: false
+    device:
+      ip: 0.0.0.0
+      port: 22
+
+  rootfs:
+    chroot:
+      - ./scripts/customCog.sh
+    copy:
+      - ./services/cog-gpu-demo.service:/etc/systemd/system/cog-gpu-demo.service
+
+  services:
+    enable:
+      - cog-gpu-demo.service
+    disable:
+      - pair-fb.service
+
+  apt:
+    install:
+      - wget
+      - libinput10
+      - libgles-dev
+
+    install_machine:
+      imx8mp-verdin:
+        - imx-gpu-viv-wayland-dev
+      luna:
+        - sl1680-gpu-pvr

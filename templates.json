@@ -72,6 +72,29 @@
                 "scripts/dotnet/dotnet-build-debug.xsh",
                 "scripts/dotnet/install-vsdbg.sh"
             ]
+        },
+        {
+            "img": "cog.jpg",
+            "folder": "cogBrowser",
+            "description": "Cog is a small single “window” launcher for the WebKit WPE browser",
+            "runtime": "opus",
+            "language": "YAML",
+            "multiContainer": false,
+            "support": "Community",
+            "status": "ok",
+            "customFields": [
+                {
+                    "id": "osPackageName",
+                    "label": "OS Package Name",
+                    "placeHolder": "The OS package name, e.g. my-awesome-os",
+                    "default": "",
+                    "type": "text",
+                    "validRegex": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+                    "errorMessage": "Invalid OStree package name",
+                    "description": "The name of your OS package"
+                }
+            ],
+            "commonAssets": []
         }
     ]
 }

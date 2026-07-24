@@ -1,0 +1,16 @@
+[Unit]
+Description=cog GPU Demo
+After=network-online.target rc-local.service systemd-user-sessions.service getty.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/cog -P drm -O renderer=gles https://microhobby.com.br/tests/3d.html
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

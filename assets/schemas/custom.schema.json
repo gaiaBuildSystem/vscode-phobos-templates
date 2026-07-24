@@ -88,6 +88,16 @@
                             },
                             "description": "A list of packages to install via apt."
                         },
+                        "install_machine": {
+                            "type": "object",
+                            "description": "A mapping of machine names to machine-specific apt packages.",
+                            "additionalProperties": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        },
                         "install_debug":{
                             "type": "array",
                             "items": {
@@ -106,6 +116,9 @@
                     "anyOf": [
                         {
                             "required": ["install"]
+                        },
+                        {
+                            "required": ["install_machine"]
                         },
                         {
                             "required": ["install_debug"]
