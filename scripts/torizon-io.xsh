@@ -9,6 +9,7 @@ $XONSH_SHOW_TRACEBACK = True
 
 import os
 import sys
+import json
 import requests
 import traceback
 from typing import List
@@ -16,14 +17,32 @@ import torizon_io_api as torizon_cloud
 from torizon_templates_utils.errors import Error,Error_Out,last_return_code
 from torizon_templates_utils.colors import Color,BgColor,print
 
+_CREDS_FILE = os.path.join(os.getcwd(), "torizonAPICreds.json")
+
+_client_id = None
+_client_secret = None
+
+if os.path.exists(_CREDS_FILE):
+    with open(_CREDS_FILE, "r") as f:
+        _creds = json.load(f)
+
+    _client_id = _creds.get("clientId")
+    _client_secret = _creds.get("clientSecret")
+
+if not _client_id:
+    _client_id = os.environ.get("PLATFORM_CLIENT_ID")
+
+if not _client_secret:
+    _client_secret = os.environ.get("PLATFORM_CLIENT_SECRET")
+
 # fail fast
-if "PLATFORM_CLIENT_ID" not in os.environ:
+if not _client_id:
     Error_Out(
         "❌ Environment variable PLATFORM_CLIENT_ID not set",
         Error.ENOCONF
     )
 
-if "PLATFORM_CLIENT_SECRET" not in os.environ:
+if not _client_secret:
     Error_Out(
         "❌ Environment variable PLATFORM_CLIENT_SECRET not set",
         Error.ENOCONF
@@ -37,8 +56,8 @@ def __get_jon_oster_token():
 
     payload = {
         "grant_type": "client_credentials",
-        "client_id": os.environ.get("PLATFORM_CLIENT_ID"),
-        "client_secret": os.environ.get("PLATFORM_CLIENT_SECRET")
+        "client_id": _client_id,
+        "client_secret": _client_secret
     }
 
     response = requests.post(
