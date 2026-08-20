@@ -258,6 +258,7 @@ def package_list(package_name: str):
             {
                 "name": package.name,
                 "version": package.version,
+                "target": package.hardware_ids,
                 "hash": package.hashes["sha256"],
                 "createdAt": package.created_at.isoformat()
             }
@@ -323,6 +324,19 @@ def package_list_sources():
         return _ret
 
 
+def package_refresh_sources():
+    with torizon_cloud.ApiClient(_cfg) as api_client:
+        _api = torizon_cloud.PackagesApi(api_client)
+        _sources = _api.get_packages_external_info()
+
+        for _name in _sources.keys():
+            _api.get_packages_external_refresh_source_file_name(
+                source_file_name=_name
+            )
+
+            print(f"✅ Source {_name} refreshed")
+
+
 def update_fleet_latest(package_name: str, fleet_name: str):
     _hash = package_latest_hash(package_name)
     _package = __get_target_by_hash(_hash)
@@ -358,6 +372,8 @@ def _usage():
     print("        package list <package name>")
     print("    List all package sources:")
     print("        package list sources")
+    print("    Refresh all external package sources:")
+    print("        package refresh sources")
     print("    Delete a package version by hash:")
     print("        package delete <package name> <package hash>")
     print("")
@@ -382,13 +398,16 @@ except IndexError:
 x = 3
 
 try:
-    # check if the function exists
-    _func = globals()[f"{_cmd}_{_sub}"]
+    # a cmd with three verbs takes priority over a two-verb one, otherwise
+    # e.g. "package list sources" would always match "package_list" and
+    # treat "sources" as a package name instead of dispatching to
+    # "package_list_sources"
+    x = 4
+    _func = globals()[f"{_cmd}_{_sub}_{_third}"]
 except:
-    # possible a cmd with three verbs?
     try:
-        x = 4
-        _func = globals()[f"{_cmd}_{_sub}_{_third}"]
+        x = 3
+        _func = globals()[f"{_cmd}_{_sub}"]
     except:
         # no so let's show the usage and exit
         _usage()
