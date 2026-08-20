@@ -272,6 +272,57 @@ def package_list(package_name: str):
         return _ret
 
 
+def package_delete(package_name: str, package_hash: str):
+    with torizon_cloud.ApiClient(_cfg) as api_client:
+        _api = torizon_cloud.PackagesApi(api_client)
+        _packages = _api.get_packages(
+            limit=sys.maxsize,
+            hashes=[package_hash]
+        )
+
+        _package = None
+        for package in _packages.values:
+            if package.name == package_name:
+                _package = package
+                break
+
+        if _package is None:
+            Error_Out(
+                f"❌ Package {package_name} with hash {package_hash} not found",
+                Error.ENOFOUND
+            )
+
+        print(f"Deleting package {package_name} ({_package.package_id}) ...")
+        _api.delete_packages_packageid(
+            package_id=_package.package_id
+        )
+
+        print(f"✅ Package {package_name} ({package_hash}) deleted")
+
+
+def package_list_sources():
+    with torizon_cloud.ApiClient(_cfg) as api_client:
+        _api = torizon_cloud.PackagesApi(api_client)
+        _sources = _api.get_packages_external_info()
+
+        _ret = [
+            {
+                "name": _name,
+                "friendlyName": _info.friendly_name,
+                "remoteUri": _info.remote_uri,
+                "lastFetched": _info.last_fetched.isoformat() if _info.last_fetched else None,
+                "expires": _info.expires.isoformat() if _info.expires else None
+            }
+            for _name, _info in _sources.items()
+        ]
+
+        # use the unwrapped builtin print here: the colorized print()
+        # always appends a trailing ANSI reset code, which corrupts
+        # the JSON output when piped into tools like jq
+        builtins.print(json.dumps(_ret, indent=2))
+        return _ret
+
+
 def update_fleet_latest(package_name: str, fleet_name: str):
     _hash = package_latest_hash(package_name)
     _package = __get_target_by_hash(_hash)
@@ -305,6 +356,10 @@ def _usage():
     print("        package latest version <package name>")
     print("    List all versions of a package as JSON (name, version, hash, createdAt):")
     print("        package list <package name>")
+    print("    List all package sources:")
+    print("        package list sources")
+    print("    Delete a package version by hash:")
+    print("        package delete <package name> <package hash>")
     print("")
     print("    Update a fleet with a defined package:")
     print("        update fleet latest <package name> <fleet name>")
