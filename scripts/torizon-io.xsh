@@ -10,6 +10,7 @@ $XONSH_SHOW_TRACEBACK = True
 import os
 import sys
 import json
+import builtins
 import requests
 import traceback
 from typing import List
@@ -146,6 +147,15 @@ def __resolve_platform_metadata(
 
     for package in packages:
         if package.name == package_name:
+            try:
+                int(package.version)
+            except ValueError:
+                Error_Out(
+                    f"❌ Package version for {package_name} is not an integer: {package.version}",
+                    Error.EABORT
+                )
+
+            # if no error we can compare the versions
             if int(package.version) > _latest_version:
                 _latest_version = int(package.version)
                 _hash = package.hashes["sha256"]
@@ -236,6 +246,32 @@ def package_latest_version(package_name: str):
         return _ret["version"]
 
 
+def package_list(package_name: str):
+    with torizon_cloud.ApiClient(_cfg) as api_client:
+        _api = torizon_cloud.PackagesApi(api_client)
+        _packages = _api.get_packages(
+            limit=sys.maxsize,
+            name_contains=package_name
+        )
+
+        _ret = [
+            {
+                "name": package.name,
+                "version": package.version,
+                "hash": package.hashes["sha256"],
+                "createdAt": package.created_at.isoformat()
+            }
+            for package in _packages.values
+            if package.name == package_name
+        ]
+
+        # use the unwrapped builtin print here: the colorized print()
+        # always appends a trailing ANSI reset code, which corrupts
+        # the JSON output when piped into tools like jq
+        builtins.print(json.dumps(_ret, indent=2))
+        return _ret
+
+
 def update_fleet_latest(package_name: str, fleet_name: str):
     _hash = package_latest_hash(package_name)
     _package = __get_target_by_hash(_hash)
@@ -267,6 +303,8 @@ def _usage():
     print("        package latest hash <package name>")
     print("    Get the latest version pushed by package name:")
     print("        package latest version <package name>")
+    print("    List all versions of a package as JSON (name, version, hash, createdAt):")
+    print("        package list <package name>")
     print("")
     print("    Update a fleet with a defined package:")
     print("        update fleet latest <package name> <fleet name>")
