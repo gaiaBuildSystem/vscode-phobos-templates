@@ -15,23 +15,11 @@ function _check_xonsh_update {
     fi
 }
 
-function _do_injections {
-    pipx inject xonsh distro
-    pipx inject xonsh shtab
-    pipx inject xonsh pyyaml
-    pipx inject xonsh psutil
-    pipx inject xonsh ruamel.yaml
-    pipx inject xonsh torizon-templates-utils
-    pipx inject xonsh GitPython
-    pipx inject xonsh python-lsp-server
-    pipx inject xonsh pylsp-rope
-}
-
 function _check_xonsh_global {
     # we need to check if we need to run the setup as root
     # at the first time we should need to symlink the xonsh to the /usr/bin
-    # read the /usr/bin/xonsh and check if it is linked to the
-    # $HOME/.local/pipx/venvs/xonsh/bin/xonsh, if not we need to run with sudo
+    # read the /usr/bin/xonsh and check if it is linked to
+    # the $HOME/.local/pipx/venvs/xonsh/bin/xonsh, if not we need to run with sudo
     local local_xonsh="$HOME/.local/pipx/venvs/xonsh/bin/xonsh"
     local global_xonsh="/usr/bin/xonsh"
 
@@ -64,6 +52,102 @@ function _check_xonsh_global {
     fi
 
     return 0
+}
+
+function _do_injections {
+    pipx inject xonsh distro
+    pipx inject xonsh shtab
+    pipx inject xonsh pyyaml
+    pipx inject xonsh psutil
+    pipx inject xonsh ruamel.yaml
+    pipx inject xonsh torizon-templates-utils
+    pipx inject xonsh GitPython
+    pipx inject xonsh python-lsp-server
+    pipx inject xonsh pylsp-rope
+}
+
+function _setup_torizon_dev_symlink {
+    local zygote_path="$(realpath "$(dirname "$(readlink -f "$0")")/../zygote.xsh")"
+    local target_symlink="/usr/bin/torizon-dev"
+
+    if [ ! -f "$zygote_path" ]; then
+        echo "Error: $zygote_path not found."
+        return 1
+    fi
+
+    if [ -e "$target_symlink" ] && [ "$(readlink -f "$target_symlink")" = "$zygote_path" ]; then
+        return 0
+    fi
+
+    if [ -e "$target_symlink" ]; then
+        echo "The symlink $target_symlink is not pointing to $zygote_path, trying to relink ..."
+    else
+        echo "$target_symlink does not exist, creating global symlink ..."
+    fi
+
+    if [ -z "${PSSWD}" ]; then
+        echo "Insufficient permissions to create $target_symlink and PSSWD is not set."
+        return 1
+    fi
+
+    if ! printf '%s\n' "$PSSWD" | sudo -S ln -sf "$zygote_path" "$target_symlink"; then
+        echo "Failed to create $target_symlink using sudo. Check password and sudo permissions."
+        return 1
+    fi
+}
+
+function _install_bash_completion {
+    local completion_file="$(realpath "$(dirname "$(readlink -f "$0")")/tcd-completion.bash")"
+    local target_completion="/usr/share/bash-completion/completions/tcd"
+
+    if [ ! -f "$completion_file" ]; then
+        echo "Error: $completion_file not found."
+        return 1
+    fi
+
+    if [ -e "$target_completion" ] && [ "$(readlink -f "$target_completion")" = "$completion_file" ]; then
+        return 0
+    fi
+
+    if [ -e "$target_completion" ]; then
+        echo "The symlink $target_completion is not pointing to $completion_file, trying to relink ..."
+    else
+        echo "$target_completion does not exist, creating global bash completion symlink ..."
+    fi
+
+    if [ -z "${PSSWD}" ]; then
+        echo "Insufficient permissions to create $target_completion and PSSWD is not set."
+        return 1
+    fi
+
+    if ! printf '%s\n' "$PSSWD" | sudo -S ln -sf "$completion_file" "$target_completion"; then
+        echo "Failed to create $target_completion using sudo. Check password and sudo permissions."
+        return 1
+    fi
+}
+
+function _install_node_dependencies {
+    local node_dir="$(realpath "$(dirname "$(readlink -f "$0")")/../node")"
+
+    if [ ! -d "$node_dir" ]; then
+        echo "Error: Node directory $node_dir not found."
+        return 1
+    fi
+
+    if [ -d "$node_dir/node_modules" ]; then
+        echo "Node dependencies already exist in $node_dir, skipping npm install..."
+        return 0
+    fi
+
+    echo "Installing Node dependencies in $node_dir..."
+    (cd "$node_dir" && npm install)
+
+    if [ $? -ne 0 ]; then
+        echo "Failed to install Node dependencies."
+        return 1
+    fi
+
+    echo "Node dependencies installed successfully ✅"
 }
 
 # check if xonsh is on $HOME/.local/bin
@@ -105,6 +189,9 @@ if [ -f "$HOME/.local/bin/xonsh" ]; then
     fi
 
     _do_injections
+    _setup_torizon_dev_symlink
+    _install_bash_completion
+    _install_node_dependencies
 
     # re-check if we need to link xonsh globally
     if ! _check_xonsh_global; then
@@ -122,6 +209,9 @@ pipx install xonsh==$_XONSH_TARGET
 pipx ensurepath
 
 _do_injections
+_setup_torizon_dev_symlink
+_install_bash_completion
+_install_node_dependencies
 
 # add xonsh to the path if not already present
 if ! grep -q "export PATH=\$PATH:\$HOME/.local/bin" ~/.bashrc; then
