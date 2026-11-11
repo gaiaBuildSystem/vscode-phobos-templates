@@ -1,5 +1,6 @@
 {
-    "window.title": "TEMPLATES",
+    "window.title": "PhobOS TEMPLATES",
+    "workbench.sideBar.location": "left",
     "json.validate.enable": true,
     "json.schemas": [
         {
@@ -7,27 +8,16 @@
                 "*common.json",
                 "*tasks.json"
             ],
-            "url": "./assets/json/tasks.schema.json"
+            "url": "./assets/schemas/tasks.schema.json"
+        },
+        {
+            "fileMatch": [
+                "*templates.json"
+            ],
+            "url": "./assets/schemas/templates.schema.json"
         }
     ],
     "tasksLabel.includeFiles": [
-        "assets/tasks/common.json",
-        // "cConsole/.vscode/tasks.json",
-        // "cppConsole/.vscode/tasks.json",
-        // "cmakeConsole/.vscode/tasks.json",
-        // "gambasForms/.vscode/tasks.json",
-        // "aspnetBlazor/.vscode/tasks.json",
-        // "python3Console/.vscode/tasks.json",
-        // "python3Pyside2QML/.vscode/tasks.json",
-        // "cppQML/.vscode/tasks.json",
-        // "javaForms/.vscode/tasks.json",
-        // "monoCsharpForms/.vscode/tasks.json",
-        // "dotnetSlint/.vscode/tasks.json",
-        // "dotnetAvaloniaFrameBuffer/.vscode/tasks.json",
-        // "dotnetAvalonia/.vscode/tasks.json",
-        // "dotnetUno5/.vscode/tasks.json",
-        // "dotnetUno5FrameBuffer/.vscode/tasks.json",
-        // "cppSlint/.vscode/tasks.json",
-        "tcb/.vscode/tasks.json"
+        "assets/tasks/common.json"
     ]
 }

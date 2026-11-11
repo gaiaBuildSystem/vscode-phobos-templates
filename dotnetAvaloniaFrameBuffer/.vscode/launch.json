@@ -10,7 +10,6 @@
             "stopAtEntry": false,
             "console": "internalConsole",
             "env": {
-                // "AVALONIA_FB": "true",
                 "AVALONIA_DRM": "true"
             },
             "args": [],

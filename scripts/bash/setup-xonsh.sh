@@ -4,6 +4,13 @@ echo "🐚 SETUP XONSH"
 
 _XONSH_TARGET="0.23.7"
 
+# pipx bin dir is not always $HOME/.local/bin (e.g. GitHub runners set
+# PIPX_BIN_DIR=/opt/pipx_bin system wide), so ask pipx itself
+_PIPX_BIN_DIR="$(pipx environment --value PIPX_BIN_DIR 2>/dev/null)"
+if [ -z "$_PIPX_BIN_DIR" ]; then
+    _PIPX_BIN_DIR="${PIPX_BIN_DIR:-$HOME/.local/bin}"
+fi
+
 function _check_xonsh_update {
     # make sure we are also updating to the target version of xonsh
     _XONSH_CURRENT=$(pipx list --short 2>/dev/null | grep "^xonsh " | awk '{print $2}')
@@ -31,12 +38,12 @@ function _check_xonsh_global {
     # we need to check if we need to run the setup as root
     # at the first time we should need to symlink the xonsh to the /usr/bin
     # read the /usr/bin/xonsh and check if it is linked to the
-    # $HOME/.local/pipx/venvs/xonsh/bin/xonsh, if not we need to run with sudo
-    local local_xonsh="$HOME/.local/pipx/venvs/xonsh/bin/xonsh"
+    # pipx venv xonsh, if not we need to run with sudo
     local global_xonsh="/usr/bin/xonsh"
 
-    # get the local xonsh by the real path from $HOME/.local/bin/xonsh
-    local_xonsh="$(readlink -f "$HOME/.local/bin/xonsh")"
+    # get the local xonsh by the real path from the pipx bin dir
+    local local_xonsh
+    local_xonsh="$(readlink -f "$_PIPX_BIN_DIR/xonsh")"
 
     if [ ! -f "$local_xonsh" ]; then
         echo "Expected local xonsh at $local_xonsh but it was not found."
@@ -75,8 +82,8 @@ function _check_xonsh_global {
     return 0
 }
 
-# check if xonsh is on $HOME/.local/bin
-if [ -f "$HOME/.local/bin/xonsh" ]; then
+# check if xonsh is already installed in the pipx bin dir
+if [ -f "$_PIPX_BIN_DIR/xonsh" ]; then
     _check_xonsh_update
     echo "updating torizon-templates-utils ..."
 

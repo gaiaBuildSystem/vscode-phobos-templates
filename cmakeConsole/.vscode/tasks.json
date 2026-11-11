@@ -41,35 +41,6 @@
             }
         },
         {
-            "label": "apply-phobos-packages-arch",
-            "detail": "",
-            "hide": true,
-            "command": "xonsh",
-            "type": "process",
-            "args": [
-                "${workspaceFolder}/.conf/torizon-packages.xsh",
-                "${config:torizon_arch}"
-            ],
-            "options": {
-                "env": {
-                    "PHOBOS_IP": "${config:torizon_ip}",
-                    "PHOBOS_PORT": "${config:torizon_debug_ssh_port}"
-                }
-            },
-            "dependsOrder": "sequence",
-            "icon": {
-                "id": "gear",
-                "color": "terminal.ansiYellow"
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "group": "build-execution"
-            }
-        },
-        {
             "label": "build-container-image-sdk-arch",
             "detail": "",
             "hide": true,
