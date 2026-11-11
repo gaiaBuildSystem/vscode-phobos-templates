@@ -63,7 +63,8 @@ VOLUME /run/user/${UID}/wayland-0:/run/user/${UID}/wayland-0
 VOLUME /var/run/docker.sock:/var/run/docker.sock
 
 # use docker daemon and tools
-COPY --from=docker:dind /usr/local/bin/containerd /usr/local/bin/
+# NOTE: docker:dind >= 29 no longer ships a standalone containerd binary —
+# dockerd embeds containerd, so only the shim is still required
 COPY --from=docker:dind /usr/local/bin/runc /usr/local/bin/
 COPY --from=docker:dind /usr/local/bin/dockerd /usr/local/bin/
 COPY --from=docker:dind /usr/local/bin/docker /usr/local/bin/

@@ -53,6 +53,15 @@ function _check_xonsh_global {
         echo "$global_xonsh does not exist, creating global xonsh link ..."
     fi
 
+    if [ "$(id -u)" -eq 0 ]; then
+        # already root (e.g. CI running the script via sudo), no password needed
+        if ! ln -sf "$local_xonsh" "$global_xonsh"; then
+            echo "Failed to create $global_xonsh."
+            return 1
+        fi
+        return 0
+    fi
+
     if [ -z "${PSSWD}" ]; then
         echo "Insufficient permissions to create $global_xonsh and PSSWD is not set."
         return 1
