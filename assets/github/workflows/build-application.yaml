@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-24.04
     name: Build & Deploy
     container:
-      image: torizonextras/torizon-dev:dev
+      image: pergamos/torizon-dev:dev
       options: --user root
     steps:
       - uses: actions/checkout@v4

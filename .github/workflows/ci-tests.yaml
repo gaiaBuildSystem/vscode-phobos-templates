@@ -23,7 +23,7 @@ jobs:
   check-eof-new-line:
     runs-on: ubuntu-24.04
     container:
-      image: torizonextras/torizon-dev:dev
+      image: pergamos/torizon-dev:dev
       options: --user root
     name: Check EOF New Line
     steps:
@@ -39,7 +39,7 @@ jobs:
   check-json:
     runs-on: ubuntu-24.04
     container:
-      image: torizonextras/torizon-dev:dev
+      image: pergamos/torizon-dev:dev
       options: --user root
     name: Check JSON
     steps:
@@ -55,7 +55,7 @@ jobs:
   check-task-duplicates:
     runs-on: ubuntu-24.04
     container:
-      image: torizonextras/torizon-dev:dev
+      image: pergamos/torizon-dev:dev
       options: --user root
     name: Check Task Duplicates
     steps:

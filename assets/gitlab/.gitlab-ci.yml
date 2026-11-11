@@ -29,7 +29,7 @@ stages:
 initial_setup:
   stage: setup
   image:
-    name: torizonextras/torizon-dev:dev
+    name: pergamos/torizon-dev:dev
     docker:
       user: root
     entrypoint: [""]
@@ -52,7 +52,7 @@ initial_setup:
 publish_image:
   stage: publish
   image:
-    name: torizonextras/torizon-dev:dev
+    name: pergamos/torizon-dev:dev
     docker:
       user: root
     entrypoint: [""]
@@ -72,7 +72,7 @@ publish_image:
 deploy_application:
   stage: deploy
   image:
-    name: torizonextras/torizon-dev:dev
+    name: pergamos/torizon-dev:dev
     docker:
       user: root
     entrypoint: [""]

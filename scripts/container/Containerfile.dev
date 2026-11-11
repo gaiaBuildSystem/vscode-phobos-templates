@@ -2,7 +2,7 @@ ARG BRANCH=dev
 ARG UID=1000
 
 
-FROM torizonextras/torizon-dev-tasks:${BRANCH}
+FROM pergamos/torizon-dev-tasks:${BRANCH}
 
 ARG BRANCH
 ARG UID

@@ -2,7 +2,7 @@ ARG BRANCH=dev
 ARG REPO=torizon/vscode-torizon-templates
 
 
-FROM torizonextras/xonsh:${BRANCH}
+FROM pergamos/xonsh:${BRANCH}
 
 ARG BRANCH
 ARG REPO

@@ -7,7 +7,7 @@ services:
       dockerfile: container/Containerfile.xonsh
       args:
         - BRANCH=${__TCD_BRANCH}
-    image: torizonextras/xonsh:${__TCD_BRANCH}
+    image: pergamos/xonsh:${__TCD_BRANCH}
 
 
   tasks:
@@ -17,7 +17,7 @@ services:
       args:
         - BRANCH=${__TCD_BRANCH}
         - REPO=toradex/vscode-torizon-templates
-    image: torizonextras/torizon-dev-tasks:${__TCD_BRANCH}
+    image: pergamos/torizon-dev-tasks:${__TCD_BRANCH}
 
 
   xonsh-wrapper:
@@ -26,7 +26,7 @@ services:
       dockerfile: container/Containerfile.wrapper
       args:
         - BRANCH=${__TCD_BRANCH}
-    image: torizonextras/xonsh-wrapper:${__TCD_BRANCH}
+    image: pergamos/xonsh-wrapper:${__TCD_BRANCH}
 
 
   torizon-dev:
@@ -36,7 +36,7 @@ services:
       args:
         - BRANCH=${__TCD_BRANCH}
         - UID=${__TCD_UUID}
-    image: torizonextras/torizon-dev:${__TCD_BRANCH}
+    image: pergamos/torizon-dev:${__TCD_BRANCH}
     privileged: true
     network_mode: host
     environment:

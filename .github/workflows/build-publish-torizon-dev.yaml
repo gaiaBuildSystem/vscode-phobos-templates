@@ -1,4 +1,4 @@
-name: Publish Torizon Utils
+name: Publish Torizon Dev
 on:
   workflow_call:
 
