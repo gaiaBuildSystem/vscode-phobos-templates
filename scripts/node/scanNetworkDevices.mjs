@@ -10,12 +10,10 @@ async function main() {
     console.log = function() {};
 
     // show the devices found in async mode
-    const devDect = new DeviceDetection((dev) => {
-        _clTmp(`\n\t\t ${ix} ➡️  ${dev.Hostname} (${dev.Ip}) \n`);
+    const nets = await DeviceDetection.GetPhobOSDevices((dev) => {
+        _clTmp(`\n\t\t ${ix} ➡️  ${dev.Description} \n`);
         ix++;
     });
-
-    const nets = await devDect.ScanDevices();
 
     // enable console.log
     console.log = _clTmp;
