@@ -7,7 +7,7 @@ _shtab_zygote_xsh_connect_subparsers=('list')
 _shtab_zygote_xsh_new_subparsers=('cli')
 _shtab_zygote_xsh_tasks_subparsers=('list' 'desc' 'run')
 
-_shtab_zygote_xsh_option_strings=('-h' '--help' '--version' '-v')
+_shtab_zygote_xsh_option_strings=('-h' '--help' '--version' '-v' '--clean' '-c')
 _shtab_zygote_xsh_scan_option_strings=('-h' '--help')
 _shtab_zygote_xsh_scan_list_option_strings=('-h' '--help')
 _shtab_zygote_xsh_scan_connect_option_strings=('-h' '--help')
@@ -45,6 +45,8 @@ _shtab_zygote_xsh__h_nargs=0
 _shtab_zygote_xsh___help_nargs=0
 _shtab_zygote_xsh___version_nargs=0
 _shtab_zygote_xsh__v_nargs=0
+_shtab_zygote_xsh___clean_nargs=0
+_shtab_zygote_xsh__c_nargs=0
 _shtab_zygote_xsh_scan_pos_0_nargs=A...
 _shtab_zygote_xsh_scan__h_nargs=0
 _shtab_zygote_xsh_scan___help_nargs=0
@@ -173,6 +175,16 @@ _shtab_zygote_xsh() {
   local current_option_strings
   local sub_parsers
   COMPREPLY=()
+
+  ### NON GENERATED CODE ###
+  # torizon-dev wrapper only: `--clean [--yes|-y]`
+  if [[ "${COMP_WORDS[1]-}" == "--clean" || "${COMP_WORDS[1]-}" == "-c" ]]; then
+    if [[ $COMP_CWORD -eq 2 ]]; then
+      COMPREPLY=( $(compgen -W "--yes -y" -- "${completing_word}") )
+    fi
+    return 0
+  fi
+  ### NON GENERATED CODE ###
 
   local prefix=_shtab_zygote_xsh
   local word_index=0
