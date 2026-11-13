@@ -106,7 +106,11 @@ def _connect(args):
 
         if _ip is not None:
             cd $SCRIPT_PATH
-            xonsh ./connect-device.xsh @(args.id)
+            # empty means "ask interactively" on the connect-device side
+            xonsh ./connect-device.xsh \
+                @(args.id) \
+                @(getattr(args, "login", None) or "") \
+                @(getattr(args, "password", None) or "")
             # aesthetic
             print("")
 
@@ -515,6 +519,16 @@ parser_scan_connect.add_argument(
     type=int,
     help="index of the network device to connect to"
 )
+parser_scan_connect.add_argument(
+    "--login", "-l",
+    type=str,
+    help="login of the device user (asked interactively if omitted)"
+)
+parser_scan_connect.add_argument(
+    "--password", "-p",
+    type=str,
+    help="password of the device user (asked interactively if omitted)"
+)
 parser_scan_connect.set_defaults(func=_connect)
 # ------------------------------------------------------------------------- SCAN
 
@@ -583,6 +597,16 @@ parser_target_apply_dto.set_defaults(func=_tasks_apply_dto)
 connect_scan = subparser.add_parser(
     "connect",
     help="Scan network for devices and interactively connect"
+)
+connect_scan.add_argument(
+    "--login", "-l",
+    type=str,
+    help="login of the device user (asked interactively if omitted)"
+)
+connect_scan.add_argument(
+    "--password", "-p",
+    type=str,
+    help="password of the device user (asked interactively if omitted)"
 )
 connect_scan.set_defaults(func=_scan_connect)
 connect_scan_sub = connect_scan.add_subparsers(title="subcommands")

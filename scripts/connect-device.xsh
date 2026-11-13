@@ -57,6 +57,10 @@ def masked_input(prompt=''):
 
 
 _id = sys.argv[1]
+# optional credentials from the zygote --login/--password arguments,
+# empty means ask interactively
+_login = sys.argv[2] if len(sys.argv) > 2 else ""
+_password = sys.argv[3] if len(sys.argv) > 3 else ""
 
 
 print("📡 :: CONNECTING DEVICE :: 📡")
@@ -95,10 +99,20 @@ else:
 _hostname = dev["Hostname"]
 _ip = dev["Ip"]
 
-print("")
-_login = input("Login> ")
-_password = masked_input("Password> ")
-print("")
+# only prompt for what was not given, and only if there is someone to answer
+if _login == "" or _password == "":
+    if not sys.stdin.isatty():
+        Error_Out(
+            "❌ :: No terminal to ask for the credentials, use --login and --password :: ❌",
+            Error.EUSER
+        )
+
+    print("")
+    if _login == "":
+        _login = input("Login> ")
+    if _password == "":
+        _password = masked_input("Password> ")
+    print("")
 
 # check login sanity
 if _login == "":
