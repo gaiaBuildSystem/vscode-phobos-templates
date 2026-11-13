@@ -35,16 +35,49 @@ with open(f"{os.environ['HOME']}/.apollox/templates.json", "r") as f:
     _templates = json.load(f)["Templates"]
 
 print("📦 :: TEMPLATES :: 📦")
-for _template in _templates:
+for _ix, _template in enumerate(_templates):
     print("")
-    print(f"\t 📦 Template: {_template['folder']}", color=Color.BLACK, bg_color=BgColor.BRIGTH_BLUE)
+    print(f"\t [{_ix}] 📦 Template: {_template['folder']}", color=Color.BLACK, bg_color=BgColor.BRIGTH_BLUE)
     print(f"\t\t 📝 Description: {_template['description']}")
     print(f"\t\t 👅 Language: {_template['language']}")
     print(f"\t\t 🏃 Runtime: {_template['runtime']}")
     print("")
 
 # .2
-_template_inp = input("Choose a template> ")
+# enable <TAB> completion of the template folder names
+_template_names = [_t["folder"] for _t in _templates]
+
+try:
+    import readline
+
+    def __template_completer(text, state):
+        _matches = [_n for _n in _template_names if _n.startswith(text)]
+        return _matches[state] if state < len(_matches) else None
+
+    readline.set_completer_delims(" \t\n")
+    readline.set_completer(__template_completer)
+    readline.parse_and_bind("tab: complete")
+except ImportError:
+    # no readline available, the user can still type the name or index
+    pass
+
+_template_inp = input("Choose a template (index or name, <TAB> to complete)> ").strip()
+
+# the readline completer is only meaningful for the template prompt
+try:
+    readline.set_completer(None)
+except NameError:
+    pass
+
+# the user can also choose the template by its index
+if _template_inp.isdigit():
+    _ix = int(_template_inp)
+    if _ix < 0 or _ix >= len(_templates):
+        Error_Out(
+            f"❌ :: Template index [{_ix}] out of range :: ❌",
+            Error.ENOFOUND
+        )
+    _template_inp = _templates[_ix]["folder"]
 
 # check sanity
 if not _template_inp or _template_inp == "":
