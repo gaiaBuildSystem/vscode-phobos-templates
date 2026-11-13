@@ -38,7 +38,7 @@ export HOME
 
 __TCD_COMPOSE_FILE="$HOME/.tcd/docker-compose.yml"
 __TCD_BASH_COMPLETION_FILE="$HOME/.tcd/torizon-dev-completion.bash"
-export __TCD_APOLLOX_REPO="torizon/vscode-torizon-templates"
+export __TCD_APOLLOX_REPO="gaiaBuildSystem/vscode-phobos-templates"
 export __TCD_APOLLOX_BRANCH="dev"
 export __TCD_BRANCH="dev"
 export __TCD_UUID=$(id -u "$__TCD_REAL_USER")
@@ -106,7 +106,7 @@ cat > "$__TCD_TMP_BIN" <<'ENDOFSCRIPT'
 
 # --- Environment variables (must be set before docker commands) ---
 __TCD_COMPOSE_FILE="$HOME/.tcd/docker-compose.yml"
-export __TCD_APOLLOX_REPO="torizon/vscode-torizon-templates"
+export __TCD_APOLLOX_REPO="gaiaBuildSystem/vscode-phobos-templates"
 export __TCD_BRANCH="dev"
 export __TCD_APOLLOX_BRANCH="dev"
 export __TCD_UUID=$(id -u 2>/dev/null || echo 0)

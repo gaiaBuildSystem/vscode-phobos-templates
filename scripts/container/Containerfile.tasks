@@ -1,5 +1,5 @@
 ARG BRANCH=dev
-ARG REPO=torizon/vscode-torizon-templates
+ARG REPO=gaiaBuildSystem/vscode-phobos-templates
 
 
 FROM pergamos/xonsh:${BRANCH}
@@ -30,7 +30,7 @@ COPY --from=docker:dind /usr/local/libexec/docker/cli-plugins /usr/local/lib/doc
 WORKDIR /home/torizon
 RUN git clone --branch ${BRANCH} \
     https://github.com/${REPO}.git && \
-    mv vscode-torizon-templates .apollox
+    mv "$(basename ${REPO})" .apollox
 
 USER torizon
 

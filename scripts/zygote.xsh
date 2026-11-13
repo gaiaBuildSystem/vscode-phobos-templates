@@ -683,7 +683,7 @@ parser_fetch = subparser.add_parser(
 parser_fetch.add_argument(
     "--url", "-u",
     help="The URL of the templates repo",
-    default="https://github.com/torizon/vscode-torizon-templates.git"
+    default="https://github.com/gaiaBuildSystem/vscode-phobos-templates.git"
 )
 parser_fetch.add_argument(
     "--branch", "-b",

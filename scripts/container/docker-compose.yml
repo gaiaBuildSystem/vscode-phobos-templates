@@ -16,7 +16,7 @@ services:
       dockerfile: container/Containerfile.tasks
       args:
         - BRANCH=${__TCD_BRANCH}
-        - REPO=toradex/vscode-torizon-templates
+        - REPO=gaiaBuildSystem/vscode-phobos-templates
     image: pergamos/torizon-dev-tasks:${__TCD_BRANCH}
 
 
@@ -40,7 +40,7 @@ services:
     privileged: true
     network_mode: host
     environment:
-      - APOLLOX_TEMPLATES_GIT_REPO=https://github.com/torizon/vscode-torizon-templates.git
+      - APOLLOX_TEMPLATES_GIT_REPO=https://github.com/gaiaBuildSystem/vscode-phobos-templates.git
       - APOLLOX_TEMPLATES_GIT_REPO_BRANCH=${__TCD_BRANCH}
       #- APOLLOX_TEMPLATES_GIT_TAG=
       - WSL_DISTRO_NAME=${WSL_DISTRO_NAME}
