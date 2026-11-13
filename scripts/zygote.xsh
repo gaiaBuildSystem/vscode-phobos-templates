@@ -50,10 +50,10 @@ def _scan_list(args):
 
         _ix = 0
         for net in nets:
-            _ip = net["Ip"]
-            _hostname = net["Hostname"]
+            # same look as the live list shown while scanning
+            _desc = net.get("Description") or f"{net['Hostname']} ({net['Ip']})"
 
-            print(f"\t\t {_ix} ➡️  {_hostname} ({_ip})")
+            print(f"\t\t {_ix} ➡️  {_desc}")
             _ix += 1
 
         # aesthetic

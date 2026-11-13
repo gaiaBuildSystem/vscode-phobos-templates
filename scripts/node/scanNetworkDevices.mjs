@@ -19,6 +19,11 @@ async function finish(nets) {
     }
     process.stdin.pause();
 
+    // erase the live device list printed below the animation line, the final
+    // list is printed by zygote from the scan.json. Done here so it is ordered
+    // after our own writes (the parent's clear may race with them)
+    process.stdout.write("\r\x1b[J");
+
     // save the nets as json at the /home/user/.tcd/scan.json
     await writeFile(SCAN_FILE, JSON.stringify(nets, null, 2));
 
