@@ -11,7 +11,14 @@ async function main() {
 
     // show the devices found in async mode
     const nets = await DeviceDetection.GetPhobOSDevices((dev) => {
-        _clTmp(`\n\t\t ${ix} ➡️  ${dev.Description} \n`);
+        // the wait animation keeps redrawing the line where the cursor is,
+        // so walk down below the devices already listed, print the new one
+        // and walk back up, keeping the animation pinned on its line.
+        // \n (instead of cursor down) is used so the terminal scrolls if needed
+        const down = ix + 1;
+        process.stdout.write(
+            `${"\n".repeat(down)}\r\x1b[2K\t\t ${ix} ➡️  ${dev.Description}\x1b[${down}A\r`
+        );
         ix++;
     });
 

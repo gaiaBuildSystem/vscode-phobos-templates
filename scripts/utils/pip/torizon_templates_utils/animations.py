@@ -15,12 +15,17 @@ def run_command_with_wait_animation(call, *args):
             time.sleep(0.1)
 
         # Clear the line
-        sys.stdout.write("\r                             ")
+        sys.stdout.write("\r\x1b[2K")
 
         if running[1]:
-            sys.stdout.write("\r❌ ::    TASK FAILED    :: ❌\n")
+            sys.stdout.write("❌ ::    TASK FAILED    :: ❌\n")
         else:
-            sys.stdout.write("\r✅ ::    TASK COMPLETED    :: ✅\n")
+            sys.stdout.write("✅ ::    TASK COMPLETED    :: ✅\n")
+
+        # clear anything the command printed below the animation line
+        # while it was pinned (e.g. the scan live device list)
+        sys.stdout.write("\x1b[J")
+        sys.stdout.flush()
 
     def target():
         nonlocal output
