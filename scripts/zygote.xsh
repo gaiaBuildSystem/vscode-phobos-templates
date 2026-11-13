@@ -74,6 +74,7 @@ def _scan_list(args):
 
 def _scan(args):
     print("🔍 :: SCANNING NETWORK :: 🔍", color=Color.YELLOW)
+    print("   (press ENTER, q or Ctrl+C to stop the scan)")
     run_command_with_wait_animation(__node_scan)
     _scan_list(args)
 
