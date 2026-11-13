@@ -199,6 +199,62 @@ if [ "$CLEAN_MODE" = true ]; then
     exit 0
 fi
 
+# --- Update mode: refresh compose file and pull the latest image ---
+if [[ "${1:-}" == "--update" || "${1:-}" == "-u" ]]; then
+    echo "=== Updating Torizon dev container image ==="
+
+    mkdir -p "$HOME/.tcd"
+
+    # The compose template interpolates this, so it must be set even though
+    # we are not creating a container here
+    export __TCD_SHA_DIR=$(echo -n "$PWD" | openssl dgst -sha256 | sed 's/^.* //')
+
+    # Refresh docker-compose.yml, it may point to a new image tag
+    __TCD_COMPOSE_TMP="$(mktemp)"
+    if wget -q "https://raw.githubusercontent.com/$__TCD_APOLLOX_REPO/$__TCD_APOLLOX_BRANCH/scripts/container/docker-compose.yml" -O "$__TCD_COMPOSE_TMP" 2>/dev/null; then
+        mv "$__TCD_COMPOSE_TMP" "$__TCD_COMPOSE_FILE"
+        echo "Refreshed $__TCD_COMPOSE_FILE"
+    else
+        rm -f "$__TCD_COMPOSE_TMP"
+        if [ ! -f "$__TCD_COMPOSE_FILE" ]; then
+            echo "Error: Could not download docker-compose.yml"
+            exit 1
+        fi
+        echo "Warning: Could not refresh docker-compose.yml, using the existing one"
+    fi
+
+    echo "Pulling torizon-dev image ..."
+    docker compose -f "$__TCD_COMPOSE_FILE" pull torizon-dev || { echo "Error: Failed to pull the torizon-dev image"; exit 1; }
+
+    # Existing containers keep running the image they were created from,
+    # so point out the ones that are now outdated
+    __TCD_IMAGE=$(docker compose -f "$__TCD_COMPOSE_FILE" config --images torizon-dev 2>/dev/null | head -n1)
+    __TCD_IMAGE_ID=$(docker image inspect --format='{{.Id}}' "$__TCD_IMAGE" 2>/dev/null || true)
+    OUTDATED=""
+    while IFS= read -r cid; do
+        [ -z "$cid" ] && continue
+        CONT_IMAGE_ID=$(docker inspect --format='{{.Image}}' "$cid" 2>/dev/null || true)
+        if [ -n "$__TCD_IMAGE_ID" ] && [ "$CONT_IMAGE_ID" != "$__TCD_IMAGE_ID" ]; then
+            OUTDATED="$OUTDATED $(docker inspect --format='{{.Name}}' "$cid" 2>/dev/null | sed 's|^/||')"
+        fi
+    done < <(docker ps -aq -f name="torizon-dev-[a-f0-9]+" 2>/dev/null)
+
+    echo ""
+    echo "✅ torizon-dev image is up to date."
+    if [ -n "$OUTDATED" ]; then
+        echo ""
+        echo "⚠️  The following containers still use the previous image:"
+        for name in $OUTDATED; do
+            echo "  - $name"
+        done
+        echo ""
+        echo "To recreate them with the new image, run:"
+        echo "  torizon-dev --clean      # then run torizon-dev again in each workspace"
+    fi
+
+    exit 0
+fi
+
 # --- Compute container name hash (only needed for normal operation) ---
 myhash=$(echo -n "$PWD" | openssl dgst -sha256 | sed 's/^.* //')
 export __TCD_SHA_DIR=$myhash
@@ -283,3 +339,6 @@ echo ""
 echo "To remove all torizon-dev containers:"
 echo "    torizon-dev --clean        # asks before removing running containers"
 echo "    torizon-dev --clean --yes  # removes all without asking"
+echo ""
+echo "To update the torizon-dev container image:"
+echo "    torizon-dev --update"
