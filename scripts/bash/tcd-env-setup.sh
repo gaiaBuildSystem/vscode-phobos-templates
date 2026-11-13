@@ -280,6 +280,73 @@ if [ ! -f "$__TCD_BASH_COMPLETION_FILE" ]; then
     wget -q "https://raw.githubusercontent.com/$__TCD_APOLLOX_REPO/$__TCD_APOLLOX_BRANCH/scripts/bash/tcd-completion.bash" -O "$__TCD_BASH_COMPLETION_FILE" 2>/dev/null || true
 fi
 
+# --- WSL support ---
+# On WSL the container must see the Windows drives and the WSL interop
+# socket so Windows binaries (powershell.exe, cmd.exe, ...) can be run from
+# inside it, and the Windows directories must be in its PATH.
+__TCD_COMPOSE_ARGS=(-f "$__TCD_COMPOSE_FILE")
+__TCD_IS_WSL=false
+if [ -n "${WSL_DISTRO_NAME:-}" ] || grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null; then
+    __TCD_IS_WSL=true
+fi
+
+if [ "$__TCD_IS_WSL" = true ]; then
+    # Windows drive mount points (drvfs), e.g. /mnt/c, /mnt/d ...
+    __TCD_WSL_MOUNTS=$(awk '$3 == "drvfs" || ($3 == "9p" && $4 ~ /aname=drvfs/) { print $2 }' /proc/mounts 2>/dev/null | sort -u)
+
+    # The interop socket is per WSL session; if the variable is not set
+    # (e.g. shell not started by WSL) use the most recent socket
+    if [ -z "${WSL_INTEROP:-}" ]; then
+        WSL_INTEROP=$(ls -t /run/WSL/*_interop 2>/dev/null | head -n1)
+    fi
+    export WSL_INTEROP
+
+    # Compose override with the WSL specific mounts. /mnt is already
+    # mounted by the base compose file, so only add drives outside of it
+    __TCD_WSL_COMPOSE_FILE="$HOME/.tcd/docker-compose.wsl.yml"
+    {
+        echo "services:"
+        echo "  torizon-dev:"
+        echo "    environment:"
+        echo "      - WSL_INTEROP=\${WSL_INTEROP}"
+        echo "    volumes:"
+        echo "      - /run/WSL:/run/WSL"
+        [ -d /usr/lib/wsl ] && echo "      - /usr/lib/wsl:/usr/lib/wsl:ro"
+        for mp in $__TCD_WSL_MOUNTS; do
+            case "$mp" in
+                /mnt|/mnt/*) ;;
+                *) echo "      - \"$mp:$mp\"" ;;
+            esac
+        done
+    } > "$__TCD_WSL_COMPOSE_FILE"
+    __TCD_COMPOSE_ARGS+=(-f "$__TCD_WSL_COMPOSE_FILE")
+
+    # Windows PATH entries: the ones from the host PATH that live on a
+    # Windows drive, plus the Windows system directories as a fallback
+    __TCD_WSL_PATH=""
+    __tcd_add_wsl_path() {
+        case ":$__TCD_WSL_PATH:" in
+            *":$1:"*) ;;
+            *) __TCD_WSL_PATH="${__TCD_WSL_PATH:+$__TCD_WSL_PATH:}$1" ;;
+        esac
+    }
+    IFS=':' read -r -a __tcd_host_path <<< "$PATH"
+    for d in "${__tcd_host_path[@]}"; do
+        for mp in $__TCD_WSL_MOUNTS; do
+            case "$d" in
+                "$mp"|"$mp"/*) __tcd_add_wsl_path "$d"; break ;;
+            esac
+        done
+    done
+    for mp in $__TCD_WSL_MOUNTS; do
+        if [ -d "$mp/Windows/System32" ]; then
+            __tcd_add_wsl_path "$mp/Windows/System32"
+            __tcd_add_wsl_path "$mp/Windows"
+            __tcd_add_wsl_path "$mp/Windows/System32/WindowsPowerShell/v1.0"
+        fi
+    done
+fi
+
 # --- Container management (mirrors original torizon-dev function) ---
 if [ "$(docker ps -aq -f name="torizon-dev-$myhash")" ]; then
     # Container exists — check if it's running
@@ -288,13 +355,20 @@ if [ "$(docker ps -aq -f name="torizon-dev-$myhash")" ]; then
         docker start "torizon-dev-$myhash" > /dev/null 2>&1
         echo "Container 'torizon-dev-$myhash' was stopped, starting it..."
     fi
+
+    # Containers created before WSL support was added lack the interop mount
+    if [ "$__TCD_IS_WSL" = true ] && \
+        ! docker inspect --format='{{range .Mounts}}{{.Destination}} {{end}}' "torizon-dev-$myhash" 2>/dev/null | grep -qw "/run/WSL"; then
+        echo "⚠️  This container was created without the WSL mounts, Windows binaries will not work."
+        echo "   Recreate it with:  torizon-dev --clean && torizon-dev"
+    fi
 else
     # Create a new container for this workspace
     _workspace=$(basename "$PWD")
     echo "Configuring environment for the [$_workspace] workspace ..."
     echo "Please wait ..."
 
-    docker compose -f "$__TCD_COMPOSE_FILE" run \
+    docker compose "${__TCD_COMPOSE_ARGS[@]}" run \
         --entrypoint /bin/bash \
         --name "torizon-dev-$myhash" \
         --user root \
@@ -308,7 +382,20 @@ else
 fi
 
 # --- Execute zygote with any passed arguments ---
-docker exec -it --user torizon "torizon-dev-$myhash" zygote "$@"
+if [ "$__TCD_IS_WSL" = true ]; then
+    # WSL_INTEROP changes between WSL sessions, so pass it on every exec, and
+    # append the Windows PATH entries to the container PATH.
+    # Windows binaries translate the current directory to a Windows path and
+    # fail with "Invalid argument" if it does not exist on the WSL host (e.g.
+    # /workspace), so start in the workspace host path, which is also mounted
+    docker exec -it --user torizon -w "$PWD" \
+        -e "WSL_INTEROP=$WSL_INTEROP" \
+        -e "__TCD_WSL_PATH=$__TCD_WSL_PATH" \
+        "torizon-dev-$myhash" \
+        bash -c 'if [ -n "$__TCD_WSL_PATH" ]; then export PATH="$PATH:$__TCD_WSL_PATH"; fi; unset __TCD_WSL_PATH; exec zygote "$@"' zygote "$@"
+else
+    docker exec -it --user torizon "torizon-dev-$myhash" zygote "$@"
+fi
 ENDOFSCRIPT
 
 $SUDO install -m 0755 "$__TCD_TMP_BIN" "$TARGET_BIN"
