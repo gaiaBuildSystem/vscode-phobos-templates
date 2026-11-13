@@ -345,6 +345,42 @@ if [ "$__TCD_IS_WSL" = true ]; then
             __tcd_add_wsl_path "$mp/Windows/System32/WindowsPowerShell/v1.0"
         fi
     done
+
+    # Windows binaries translate the current directory to a Windows path
+    # (\\wsl.localhost\<distro>\...) and fail with "Invalid argument" when it
+    # does not exist on the WSL host. Inside the container that is the case
+    # for /workspace, /home/torizon and the zygote scripts folder, and zygote
+    # cd's into the latter. So put shims first in the container PATH that
+    # move to the workspace (mounted at the same path as on the host) before
+    # running the real binary. ~/.tcd is mounted at /home/torizon/.tcd
+    __TCD_WSL_SHIM_DIR="$HOME/.tcd/wsl-bin"
+    mkdir -p "$__TCD_WSL_SHIM_DIR"
+    cat > "$__TCD_WSL_SHIM_DIR/tcd-wsl-exe" <<'ENDOFSHIM'
+#!/usr/bin/env bash
+# torizon-dev WSL shim, see tcd-env-setup.sh
+__name="$(basename "$0")"
+__real=""
+IFS=':' read -r -a __dirs <<< "${TCD_WSL_PATH:-}"
+for __d in "${__dirs[@]}"; do
+    if [ -x "$__d/$__name" ]; then
+        __real="$__d/$__name"
+        break
+    fi
+done
+if [ -z "$__real" ]; then
+    echo "$__name: command not found" >&2
+    exit 127
+fi
+case "$PWD/" in
+    "${APOLLOX_WORKSPACE:-/nonexistent}/"*|/mnt/*) ;;
+    *) cd "${APOLLOX_WORKSPACE:-/}" 2>/dev/null || cd / ;;
+esac
+exec "$__real" "$@"
+ENDOFSHIM
+    chmod 0755 "$__TCD_WSL_SHIM_DIR/tcd-wsl-exe"
+    for exe in powershell.exe pwsh.exe cmd.exe wsl.exe explorer.exe netsh.exe ipconfig.exe clip.exe; do
+        ln -sf tcd-wsl-exe "$__TCD_WSL_SHIM_DIR/$exe"
+    done
 fi
 
 # --- Container management (mirrors original torizon-dev function) ---
@@ -383,16 +419,15 @@ fi
 
 # --- Execute zygote with any passed arguments ---
 if [ "$__TCD_IS_WSL" = true ]; then
-    # WSL_INTEROP changes between WSL sessions, so pass it on every exec, and
-    # append the Windows PATH entries to the container PATH.
-    # Windows binaries translate the current directory to a Windows path and
-    # fail with "Invalid argument" if it does not exist on the WSL host (e.g.
-    # /workspace), so start in the workspace host path, which is also mounted
+    # WSL_INTEROP changes between WSL sessions, so pass it on every exec.
+    # Append the Windows PATH entries to the container PATH, with the cwd
+    # shims (see above) in front. Start in the workspace host path for the
+    # same cwd reason
     docker exec -it --user torizon -w "$PWD" \
         -e "WSL_INTEROP=$WSL_INTEROP" \
-        -e "__TCD_WSL_PATH=$__TCD_WSL_PATH" \
+        -e "TCD_WSL_PATH=$__TCD_WSL_PATH" \
         "torizon-dev-$myhash" \
-        bash -c 'if [ -n "$__TCD_WSL_PATH" ]; then export PATH="$PATH:$__TCD_WSL_PATH"; fi; unset __TCD_WSL_PATH; exec zygote "$@"' zygote "$@"
+        bash -c 'export PATH="/home/torizon/.tcd/wsl-bin:$PATH${TCD_WSL_PATH:+:$TCD_WSL_PATH}"; exec zygote "$@"' zygote "$@"
 else
     docker exec -it --user torizon "torizon-dev-$myhash" zygote "$@"
 fi
