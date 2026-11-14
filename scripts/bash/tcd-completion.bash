@@ -2,7 +2,7 @@
 
 _shtab_zygote_xsh_subparsers=('scan' 'target' 'connect' 'new' 'init' 'tasks' 'fetch')
 _shtab_zygote_xsh_scan_subparsers=('list' 'connect')
-_shtab_zygote_xsh_target_subparsers=('get' 'set' 'console' 'reboot' 'shutdown' 'list-builtin-dto' 'list-applied-dto' 'apply-dto')
+_shtab_zygote_xsh_target_subparsers=('get' 'set' 'console' 'command' 'reboot' 'shutdown' 'list-builtin-dto' 'list-applied-dto' 'apply-dto')
 _shtab_zygote_xsh_connect_subparsers=('list' 'cli')
 _shtab_zygote_xsh_new_subparsers=('cli')
 _shtab_zygote_xsh_tasks_subparsers=('list' 'desc' 'run')
@@ -15,6 +15,7 @@ _shtab_zygote_xsh_target_option_strings=('-h' '--help')
 _shtab_zygote_xsh_target_get_option_strings=('-h' '--help')
 _shtab_zygote_xsh_target_set_option_strings=('-h' '--help')
 _shtab_zygote_xsh_target_console_option_strings=('-h' '--help')
+_shtab_zygote_xsh_target_command_option_strings=('-h' '--help')
 _shtab_zygote_xsh_target_reboot_option_strings=('-h' '--help')
 _shtab_zygote_xsh_target_shutdown_option_strings=('-h' '--help')
 _shtab_zygote_xsh_target_list_builtin_dto_option_strings=('-h' '--help')
@@ -36,7 +37,7 @@ _shtab_zygote_xsh_fetch_option_strings=('-h' '--help' '--url' '-u' '--branch' '-
 
 _shtab_zygote_xsh_pos_0_choices=('scan' 'target' 'connect' 'new' 'init' 'tasks' 'fetch')
 _shtab_zygote_xsh_scan_pos_0_choices=('list' 'connect')
-_shtab_zygote_xsh_target_pos_0_choices=('get' 'set' 'console' 'reboot' 'shutdown' 'list-builtin-dto' 'list-applied-dto' 'apply-dto')
+_shtab_zygote_xsh_target_pos_0_choices=('get' 'set' 'console' 'command' 'reboot' 'shutdown' 'list-builtin-dto' 'list-applied-dto' 'apply-dto')
 _shtab_zygote_xsh_connect_pos_0_choices=('list' 'cli')
 _shtab_zygote_xsh_new_pos_0_choices=('cli')
 _shtab_zygote_xsh_tasks_pos_0_choices=('list' 'desc' 'run')
@@ -66,6 +67,9 @@ _shtab_zygote_xsh_target_set__h_nargs=0
 _shtab_zygote_xsh_target_set___help_nargs=0
 _shtab_zygote_xsh_target_console__h_nargs=0
 _shtab_zygote_xsh_target_console___help_nargs=0
+_shtab_zygote_xsh_target_command_pos_0_nargs=A...
+_shtab_zygote_xsh_target_command__h_nargs=0
+_shtab_zygote_xsh_target_command___help_nargs=0
 _shtab_zygote_xsh_target_reboot__h_nargs=0
 _shtab_zygote_xsh_target_reboot___help_nargs=0
 _shtab_zygote_xsh_target_shutdown__h_nargs=0

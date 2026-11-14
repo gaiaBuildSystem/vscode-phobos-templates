@@ -365,6 +365,45 @@ def _target_console(args):
         )
 
 
+def _target_command(args):
+    target = __get_target()
+
+    if target is None:
+        Error_Out(
+            "❌ :: No target device set :: ❌",
+            Error.ENOFOUND
+        )
+
+    _cmd = list(args.cmd)
+    # allow the `torizon-dev target command -- <cmd>` form
+    if len(_cmd) > 0 and _cmd[0] == "--":
+        _cmd = _cmd[1:]
+
+    _cmd = " ".join(_cmd).strip()
+
+    if _cmd == "":
+        Error_Out(
+            "❌ :: No command to execute on the target device :: ❌",
+            Error.EINVAL
+        )
+
+    $XONSH_SUBPROC_CMD_RAISE_ERROR = False
+
+    _ret = ![sshpass \
+        -p @(target['__pass__']) \
+        ssh \
+        -o UserKnownHostsFile=/dev/null \
+        -o StrictHostKeyChecking=no \
+        -o LogLevel=ERROR \
+        -p @(target['SshPort']) \
+        @(target['Login'])@@(target['Ip']) @(_cmd)]
+
+    $XONSH_SUBPROC_CMD_RAISE_ERROR = True
+
+    # propagate the exit code of the remote command
+    sys.exit(_ret.returncode)
+
+
 def _target_list_builtin_dto(args):
     _target = __get_target()
 
@@ -561,6 +600,16 @@ parser_target_console = parser_target_sub.add_parser(
     help="Open a remote console to the target device"
 )
 parser_target_console.set_defaults(func=_target_console)
+parser_target_command = parser_target_sub.add_parser(
+    "command",
+    help="Execute a command on the target device and output the result"
+)
+parser_target_command.add_argument(
+    "cmd",
+    nargs=argparse.REMAINDER,
+    help="Command (and its arguments) to execute on the target device"
+)
+parser_target_command.set_defaults(func=_target_command)
 parser_target_reboot = parser_target_sub.add_parser(
     "reboot",
     help="Reboot the target device"
