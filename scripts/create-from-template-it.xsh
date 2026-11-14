@@ -120,17 +120,17 @@ if not _project_container_name or _project_container_name == "":
     )
 
 # .5
-_project_path = input("Project path> ")
+# the caller working dir is passed as first argument, fallback to /workspace
+_caller_pwd = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] else "/workspace"
 
-# check sanity
-if not _project_path or _project_path == "":
-    Error_Out(
-        "❌ :: Project path can not be empty :: ❌",
-        Error.EUSER
-    )
+_project_path = input(f"Project path (empty or . for {_caller_pwd})> ").strip()
 
-# Resolve relative paths to absolute paths based on the current working directory
-_project_path = os.path.abspath(os.path.join("/workspace", _project_path))
+# empty or "." means the caller current working dir
+if _project_path in ("", "."):
+    _project_path = _caller_pwd
+else:
+    # Resolve relative paths to absolute paths based on the /workspace dir
+    _project_path = os.path.abspath(os.path.join("/workspace", _project_path))
 
 if not os.path.exists(_project_path):
     Error_Out(

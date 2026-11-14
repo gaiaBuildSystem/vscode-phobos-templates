@@ -128,9 +128,12 @@ def _connect(args):
 
 
 def _new(args):
+    # keep the caller working dir, used as default project path
+    _caller_pwd = os.getcwd()
+
     try:
         cd $SCRIPT_PATH
-        xonsh ./create-from-template-it.xsh
+        xonsh ./create-from-template-it.xsh @(_caller_pwd)
     except Exception as e:
         # does nothing since the error should be handled by the script
         pass
