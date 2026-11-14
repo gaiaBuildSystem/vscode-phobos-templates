@@ -1,4 +1,4 @@
-# Torizon Templates Utils
+# Phobos Templates Utils
 
 This package contains a set of utilities to help the scripts that generate the Torizon OS applications and containers.
 

@@ -244,7 +244,7 @@ class IconOptions:
     def __init__(
             self,
             id: str,
-            color: Optional[str]
+            color: Optional[str] = None
         ):
 
         self.id = id

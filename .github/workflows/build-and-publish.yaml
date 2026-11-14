@@ -11,7 +11,14 @@ jobs:
   sanity-check:
     uses: ./.github/workflows/ci-tests.yaml
 
+  publish-phobos-utils:
+    uses: ./.github/workflows/publish-phobos-utils.yaml
+    secrets: inherit
+    needs: sanity-check
+
   publish-torizon-dev:
     uses: ./.github/workflows/build-publish-torizon-dev.yaml
     secrets: inherit
-    needs: sanity-check
+    needs:
+      - sanity-check
+      - publish-phobos-utils

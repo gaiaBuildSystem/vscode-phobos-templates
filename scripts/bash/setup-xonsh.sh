@@ -22,13 +22,23 @@ function _check_xonsh_update {
     fi
 }
 
+# the phobos-templates-utils ships the same torizon_templates_utils module
+# as the upstream torizon-templates-utils package, so having both installed
+# in the same venv makes them overwrite each other. Drop the upstream one.
+function _drop_upstream_utils {
+    if pipx runpip xonsh show torizon-templates-utils >/dev/null 2>&1; then
+        echo "removing upstream torizon-templates-utils ..."
+        pipx runpip xonsh uninstall -y torizon-templates-utils
+    fi
+}
+
 function _do_injections {
     pipx inject xonsh distro
     pipx inject xonsh shtab
     pipx inject xonsh pyyaml
     pipx inject xonsh psutil
     pipx inject xonsh ruamel.yaml
-    pipx inject xonsh torizon-templates-utils
+    pipx inject xonsh phobos-templates-utils
     pipx inject xonsh GitPython
     pipx inject xonsh python-lsp-server
     pipx inject xonsh pylsp-rope
@@ -85,7 +95,8 @@ function _check_xonsh_global {
 # check if xonsh is already installed in the pipx bin dir
 if [ -f "$_PIPX_BIN_DIR/xonsh" ]; then
     _check_xonsh_update
-    echo "updating torizon-templates-utils ..."
+    echo "updating phobos-templates-utils ..."
+    _drop_upstream_utils
 
     VARS_FILE="./.conf/repo-vars.json"
 
@@ -117,7 +128,7 @@ if [ -f "$_PIPX_BIN_DIR/xonsh" ]; then
     else
         # Fallback to package if no repo or branch/tag set
         echo "Using published package..."
-        pipx runpip xonsh install --upgrade torizon-templates-utils
+        pipx runpip xonsh install --upgrade phobos-templates-utils
     fi
 
     _do_injections

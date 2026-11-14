@@ -1,0 +1,80 @@
+name: Publish Phobos Utils
+on:
+  workflow_call:
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sanity version
+        run: |
+          # only publish from pushes to the main branch, never from PRs
+          if [ "${{ github.event_name }}" != "push" ]; then
+            echo "Not a push event, skipping publish"
+            echo "SKIP_PUBLISH=true" >> $GITHUB_ENV
+            exit 0
+          fi
+
+          version=$(python3 -c 'import tomllib; print(tomllib.load(open("./scripts/utils/pip/pyproject.toml", "rb"))["project"]["version"])')
+          echo "PKG_VERSION=$version" >> $GITHUB_ENV
+
+          # check if this version is already published on pypi
+          status=$(curl -s -o /dev/null -w '%{http_code}' \
+            "https://pypi.org/pypi/phobos-templates-utils/$version/json")
+
+          if [ "$status" == "200" ]; then
+            echo "Version $version is already published on PyPI, skipping"
+            echo "SKIP_PUBLISH=true" >> $GITHUB_ENV
+          else
+            echo "Version $version is not published on PyPI"
+            echo "SKIP_PUBLISH=false" >> $GITHUB_ENV
+          fi
+
+      - name: Create Package
+        if: env.SKIP_PUBLISH != 'true'
+        run: |
+          cd ./scripts/utils/pip
+          pipx run build
+
+      - name: TruffleHog Scan Package Artifacts
+        if: env.SKIP_PUBLISH != 'true'
+        run: |
+          docker run --rm -v "$PWD/scripts/utils/pip/dist:/dist" \
+            trufflesecurity/trufflehog:latest filesystem \
+              /dist \
+              --fail \
+              --no-update
+
+      - name: Publish Package
+        if: env.SKIP_PUBLISH != 'true'
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          cd ./scripts/utils/pip
+          pipx run twine check dist/*
+          pipx run twine upload --non-interactive dist/*
+
+      # the containers build right after this job and install the latest
+      # version from pypi, so make sure pip can already see the new one
+      - name: Wait for PyPI Index
+        if: env.SKIP_PUBLISH != 'true'
+        run: |
+          for i in $(seq 1 30); do
+            if curl -s \
+                -H 'Accept: application/vnd.pypi.simple.v1+json' \
+                -H 'Cache-Control: no-cache' \
+                https://pypi.org/simple/phobos-templates-utils/ \
+                | jq -e --arg v "$PKG_VERSION" '.versions | index($v)' > /dev/null; then
+              echo "Version $PKG_VERSION is available on the PyPI index"
+              exit 0
+            fi
+
+            echo "Waiting for $PKG_VERSION on the PyPI index ($i/30) ..."
+            sleep 10
+          done
+
+          echo "Version $PKG_VERSION did not show up on the PyPI index in time"
+          exit 1
