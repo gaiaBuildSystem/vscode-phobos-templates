@@ -106,7 +106,8 @@ def _connect(args):
 
         if _ip is not None:
             cd $SCRIPT_PATH
-            # empty means "ask interactively" on the connect-device side
+            # empty means "ask interactively" on the connect-device side,
+            # only the "connect cli" subcommand passes the credentials
             xonsh ./connect-device.xsh \
                 @(args.id) \
                 @(getattr(args, "login", None) or "") \
@@ -519,16 +520,6 @@ parser_scan_connect.add_argument(
     type=int,
     help="index of the network device to connect to"
 )
-parser_scan_connect.add_argument(
-    "--login", "-l",
-    type=str,
-    help="login of the device user (asked interactively if omitted)"
-)
-parser_scan_connect.add_argument(
-    "--password", "-p",
-    type=str,
-    help="password of the device user (asked interactively if omitted)"
-)
 parser_scan_connect.set_defaults(func=_connect)
 # ------------------------------------------------------------------------- SCAN
 
@@ -598,16 +589,6 @@ connect_scan = subparser.add_parser(
     "connect",
     help="Scan network for devices and interactively connect"
 )
-connect_scan.add_argument(
-    "--login", "-l",
-    type=str,
-    help="login of the device user (asked interactively if omitted)"
-)
-connect_scan.add_argument(
-    "--password", "-p",
-    type=str,
-    help="password of the device user (asked interactively if omitted)"
-)
 connect_scan.set_defaults(func=_scan_connect)
 connect_scan_sub = connect_scan.add_subparsers(title="subcommands")
 connect_scan_list = connect_scan_sub.add_parser(
@@ -615,6 +596,31 @@ connect_scan_list = connect_scan_sub.add_parser(
     help="Show the list of connected devices",
 )
 connect_scan_list.set_defaults(func=_connected_list)
+connect_scan_cli = connect_scan_sub.add_parser(
+    "cli",
+    help="Connect to a network device from the previous scan using the CLI"
+)
+connect_scan_cli.add_argument(
+    "--id", "-i",
+    help="Index of the network device to connect to (use the 'scan list' command to get the index)",
+    type=int,
+    required=True
+)
+connect_scan_cli.add_argument(
+    "--login", "-l",
+    help="Login of the device user",
+    type=str,
+    required=True
+)
+connect_scan_cli.add_argument(
+    "--password", "-p",
+    help="Password of the device user (defaults to the TCD_DEVICE_PASSWORD " \
+         "environment variable, to keep it out of the shell history)",
+    type=str,
+    default=os.environ.get("TCD_DEVICE_PASSWORD"),
+    required=os.environ.get("TCD_DEVICE_PASSWORD") is None
+)
+connect_scan_cli.set_defaults(func=_connect)
 # ---------------------------------------------------------------------- CONNECT
 
 

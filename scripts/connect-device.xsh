@@ -57,7 +57,7 @@ def masked_input(prompt=''):
 
 
 _id = sys.argv[1]
-# optional credentials from the zygote --login/--password arguments,
+# optional credentials from the zygote "connect cli" subcommand,
 # empty means ask interactively
 _login = sys.argv[2] if len(sys.argv) > 2 else ""
 _password = sys.argv[3] if len(sys.argv) > 3 else ""
@@ -103,7 +103,7 @@ _ip = dev["Ip"]
 if _login == "" or _password == "":
     if not sys.stdin.isatty():
         Error_Out(
-            "❌ :: No terminal to ask for the credentials, use --login and --password :: ❌",
+            "❌ :: No terminal to ask for the credentials, use the 'connect cli' command :: ❌",
             Error.EUSER
         )
 
