@@ -180,6 +180,7 @@ def _new_cli(args):
     xonsh ./create-from-template.xsh \
         @(f"{os.environ['HOME']}/.apollox/{args.template}") \
         @(args.name) \
+        @(args.name) \
         @(args.container_name) \
         @(args.path) \
         @(args.template) \

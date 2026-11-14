@@ -31,7 +31,7 @@ if len(sys.argv) < 5:
 """
 Usage:
 
-    create-from-template.xsh <template_folder> <project_name> <container_name> <new_project_path> [template] [vscode] [telemetry]
+    create-from-template.xsh <template_folder> <folder_name> <project_name> <container_name> <new_project_path> [template] [vscode] [telemetry]
 
     <template_folder>   The folder where the template that will be used to create
                         the new project is located.
