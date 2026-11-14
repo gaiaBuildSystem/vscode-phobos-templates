@@ -9,14 +9,16 @@
 
 # use the xonsh environment to update the OS environment
 $UPDATE_OS_ENVIRON = True
-# Get the full log of error
-$XONSH_SHOW_TRACEBACK = True
+# Only show the full stack trace if TDC_DEBUG_STACK is set to true
+_TDC_DEBUG_STACK = str(${...}.get("TDC_DEBUG_STACK", "false")).lower() in ("true", "1")
+$XONSH_SHOW_TRACEBACK = _TDC_DEBUG_STACK
 # always return if a cmd fails
 $XONSH_SUBPROC_CMD_RAISE_ERROR = True
 
 import os
 import sys
 import json
+import subprocess
 import distro
 import shtab
 import argparse
@@ -765,3 +767,9 @@ except KeyboardInterrupt:
         "❌ :: User interrupted the process :: ❌",
         Error.EABORT
     )
+except subprocess.CalledProcessError as _err:
+    # the sub script already reported its own error message, so just
+    # forward the exit code unless the user asked for the full stack
+    if _TDC_DEBUG_STACK:
+        raise
+    sys.exit(_err.returncode)
