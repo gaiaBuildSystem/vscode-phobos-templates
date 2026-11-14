@@ -159,8 +159,12 @@ def _new_cli(args):
             Error.EINVAL
         )
 
-    # fix up the path to be relative to the /workspace dir
-    args.path = os.path.abspath(os.path.join("/workspace", args.path))
+    # if the path is empty or "." use the current working dir
+    if args.path is None or args.path.strip() in ("", "."):
+        args.path = os.getcwd()
+    else:
+        # fix up the path to be relative to the /workspace dir
+        args.path = os.path.abspath(os.path.join("/workspace", args.path))
 
     # check if the path already exists
     if os.path.exists(f"{args.path}/{args.name}"):
@@ -655,9 +659,9 @@ parser_new_cli.add_argument(
 )
 parser_new_cli.add_argument(
     "--path", "-p",
-    help="Path to create the new project",
+    help="Path to create the new project (empty or \".\" uses the current dir)",
     type=str,
-    required=True
+    default="."
 )
 parser_new_cli.set_defaults(func=_new_cli)
 # -------------------------------------------------------------------------- NEW
