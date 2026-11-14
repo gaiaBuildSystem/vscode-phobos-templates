@@ -155,7 +155,8 @@ try:
     print("")
 
 except Exception as e:
-    if "TASKS_DEBUG" in os.environ:
+    if "TASKS_DEBUG" in os.environ or \
+        os.environ.get("TDC_DEBUG_STACK", "false").lower() in ("true", "1"):
         traceback.print_exc()
 
     if isinstance(e, ReferenceError):
