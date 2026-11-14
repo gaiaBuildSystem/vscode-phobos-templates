@@ -427,11 +427,12 @@ if [ "$__TCD_IS_WSL" = true ]; then
         -e "WSL_INTEROP=$WSL_INTEROP" \
         -e "TCD_WSL_PATH=$__TCD_WSL_PATH" \
         -e TCD_DEVICE_PASSWORD \
+        -e TDC_DEBUG_STACK \
         "torizon-dev-$myhash" \
         bash -c 'export PATH="/home/torizon/.tcd/wsl-bin:$PATH${TCD_WSL_PATH:+:$TCD_WSL_PATH}"; exec zygote "$@"' zygote "$@"
 else
     # forward the device password (if set on the host) for "connect cli"
-    docker exec -it --user torizon -e TCD_DEVICE_PASSWORD \
+    docker exec -it --user torizon -e TCD_DEVICE_PASSWORD -e TDC_DEBUG_STACK \
         "torizon-dev-$myhash" zygote "$@"
 fi
 ENDOFSCRIPT
