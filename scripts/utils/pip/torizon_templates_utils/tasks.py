@@ -783,10 +783,12 @@ class TaskRunner:
             value = task.options.env
 
             # get the env from the task
+            _env_value = None
             if value:
                 _env_value = value.get(env)
 
-            if _env_value:
+            # an empty string is a valid value (e.g. to clear a var)
+            if _env_value is not None:
                 expvalue = [_env_value]
                 expvalue = self.__check_workspace_folder(expvalue)
                 expvalue = self.__check_torizon_inputs(expvalue)
@@ -902,7 +904,8 @@ class TaskRunner:
             for env, _ in _env.items():
                 if self.__tasks_override_env == True or env not in os.environ:
                     __parsed_env_value = self.__parse_envs(env, _task)
-                    task_env[env] = __parsed_env_value
+                    if __parsed_env_value is not None:
+                        task_env[env] = __parsed_env_value
 
         # we need to change the cwd if it's set
         if _cwd is not None:
