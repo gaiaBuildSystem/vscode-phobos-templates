@@ -83,6 +83,16 @@ COPY ./zygote.xsh /home/torizon/.apollox/scripts/zygote.xsh
 RUN chmod +x /home/torizon/.apollox/scripts/zygote.xsh && \
     ln -s /home/torizon/.apollox/scripts/zygote.xsh /usr/local/bin/zygote
 
+# install the opus wrapper, the template tasks call it from
+# ${env:HOME}/.local/bin/opus, the wrapper itself spawns the opus container
+# through the host docker socket
+RUN cd /tmp && \
+    curl -fsSL https://raw.githubusercontent.com/gaiaBuildSystem/opus/refs/heads/main/.scripts/install-opus.sh | bash && \
+    rm -f /tmp/opus && \
+    mkdir -p /home/torizon/.local/bin && \
+    ln -sf /usr/local/bin/opus /home/torizon/.local/bin/opus && \
+    chown -R torizon:torizon /home/torizon/.local
+
 # Create a symlink to use bash instead of shell
 RUN ln -sf /bin/bash /bin/sh
 
