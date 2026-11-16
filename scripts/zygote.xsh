@@ -459,6 +459,49 @@ def _target_command(args):
     sys.exit(_ret.returncode)
 
 
+def __target_is_phobos(target):
+    $XONSH_SUBPROC_CMD_RAISE_ERROR = False
+
+    _ret = !(sshpass \
+        -p @(target['__pass__']) \
+        ssh \
+        -o UserKnownHostsFile=/dev/null \
+        -o StrictHostKeyChecking=no \
+        -o LogLevel=ERROR \
+        -o ConnectTimeout=10 \
+        -p @(target['SshPort']) \
+        @(target['Login'])@@(target['Ip']) cat /etc/os-release)
+    _ret.end()
+
+    $XONSH_SUBPROC_CMD_RAISE_ERROR = True
+
+    if _ret.returncode != 0:
+        Error_Out(
+            f"❌ :: Could not read /etc/os-release from {target['Hostname']} ({target['Ip']}) :: ❌",
+            Error.EFAIL
+        )
+
+    _os_release = {}
+    for _line in _ret.out.splitlines():
+        if "=" in _line:
+            _key, _val = _line.split("=", 1)
+            _os_release[_key.strip()] = _val.strip().strip('"').lower()
+
+    # some PhobOS images ship with ID=phonos, so also check the NAME
+    return (
+        _os_release.get("NAME", "") == "phobos" or
+        _os_release.get("ID", "") in ("phobos", "phonos")
+    )
+
+
+def __check_dto_supported(target):
+    if __target_is_phobos(target):
+        Error_Out(
+            "❌ :: Device tree overlays are not supported on Torizon PhobOS targets :: ❌",
+            Error.EINVAL
+        )
+
+
 def _target_list_builtin_dto(args):
     _target = __get_target()
 
@@ -469,6 +512,7 @@ def _target_list_builtin_dto(args):
         )
     else:
         _target_get(args)
+        __check_dto_supported(_target)
 
         cd $SCRIPT_PATH
         xonsh ./target-list-device-tree-overlays.xsh \
@@ -487,6 +531,7 @@ def _target_list_applied_dto(args):
         )
     else:
         _target_get(args)
+        __check_dto_supported(_target)
 
         cd $SCRIPT_PATH
         xonsh ./target-list-applied-device-tree-overlays.xsh \
@@ -556,6 +601,7 @@ def _tasks_apply_dto(args):
         )
     else:
         _target_get(args)
+        __check_dto_supported(_target)
 
         cd $SCRIPT_PATH
         xonsh ./apply-device-tree-overlay.xsh \

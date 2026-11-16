@@ -36,10 +36,14 @@ if _login is None or _pass is None or _ip is None:
 
 
 def __dev_list():
-    return !(node ./node/listDeviceTreeOverlaysApplied.mjs \
+    _ret = !(node ./node/listDeviceTreeOverlaysApplied.mjs \
                 @(_ip) \
                 @(_login) \
                 @(_pass))
+    # !() is lazy, wait for the process to finish here so the
+    # animation reports the real end (and status) of the task
+    _ret.end()
+    return _ret
 
 
 dev_list = run_command_with_wait_animation(__dev_list)
