@@ -237,13 +237,71 @@ def _new_cli(args):
 
 
 def _scan_connect(args):
-    _scan(args)
+    nets = []
+
+    if os.path.exists(f"{os.environ['HOME']}/.tcd/scan.json"):
+        with open(f"{os.environ['HOME']}/.tcd/scan.json", "r") as f:
+            nets = json.load(f)
+
+    if len(nets) == 0:
+        Error_Out(
+            "❌ :: No devices in the scan list. Did you ran the scan command? :: ❌",
+            Error.ENOFOUND
+        )
+
+    # only show the entries from the previous scan
+    _scan_list(args)
 
     # get the ix
     _ix = input("The index of the device to connect to: ")
-    args.id = int(_ix)
+
+    try:
+        args.id = int(_ix)
+    except ValueError:
+        Error_Out(
+            f"❌ :: Invalid device index [{_ix}] :: ❌",
+            Error.EINVAL
+        )
 
     _connect(args)
+
+
+def _connected_remove(args):
+    connects = []
+
+    if os.path.exists(f"{os.environ['HOME']}/.tcd/connected.json"):
+        with open(f"{os.environ['HOME']}/.tcd/connected.json", "r") as f:
+            connects = json.load(f)
+
+    if len(connects) == 0:
+        Error_Out(
+            "❌ :: No devices connected :: ❌",
+            Error.ENOFOUND
+        )
+
+    # sanity
+    if args.id >= len(connects) or args.id < 0:
+        Error_Out(
+            f"❌ :: Invalid device index [{args.id}] :: ❌",
+            Error.EINVAL
+        )
+
+    _removed = connects.pop(args.id)
+
+    with open(f"{os.environ['HOME']}/.tcd/connected.json", "w") as f:
+        json.dump(connects, f)
+
+    print("🗑️  :: DEVICE REMOVED :: 🗑️")
+    print(f"\t ➡️ {_removed['Hostname']} ({_removed['Ip']})")
+
+    # if the removed device was the target, unset the target too
+    _target = __get_target()
+
+    if _target is not None and _target.get("Ip") == _removed["Ip"]:
+        os.remove(f"{os.environ['HOME']}/.tcd/target.json")
+        print("\t 🎯 it was the target device, target unset")
+
+    print("")
 
 
 def _connected_list(args):
@@ -327,7 +385,7 @@ def _target_set(args):
             connects = json.load(f)
 
         # sanity
-        if args.id > len(connects) or args.id < 0:
+        if args.id >= len(connects) or args.id < 0:
             Error_Out(
                 f"❌ :: Invalid device index :: ❌",
                 Error.EINVAL
@@ -601,16 +659,6 @@ parser_scan_list = parser_scan_sub.add_parser(
     help="display the list of the network devices found in the previous scan",
 )
 parser_scan_list.set_defaults(func=_scan_list)
-parser_scan_connect = parser_scan_sub.add_parser(
-    "connect",
-    help="connect to a network device listed in the scan"
-)
-parser_scan_connect.add_argument(
-    "id",
-    type=int,
-    help="index of the network device to connect to"
-)
-parser_scan_connect.set_defaults(func=_connect)
 # ------------------------------------------------------------------------- SCAN
 
 
@@ -687,7 +735,7 @@ parser_target_apply_dto.set_defaults(func=_tasks_apply_dto)
 # ---------------------------------------------------------------------- CONNECT
 connect_scan = subparser.add_parser(
     "connect",
-    help="Scan network for devices and interactively connect"
+    help="Interactively connect to a network device from the previous scan"
 )
 connect_scan.set_defaults(func=_scan_connect)
 connect_scan_sub = connect_scan.add_subparsers(title="subcommands")
@@ -696,6 +744,16 @@ connect_scan_list = connect_scan_sub.add_parser(
     help="Show the list of connected devices",
 )
 connect_scan_list.set_defaults(func=_connected_list)
+connect_scan_remove = connect_scan_sub.add_parser(
+    "remove",
+    help="Remove a device from the connected devices list"
+)
+connect_scan_remove.add_argument(
+    "id",
+    type=int,
+    help="index of the connected device to remove (use the 'connect list' command to get the index)"
+)
+connect_scan_remove.set_defaults(func=_connected_remove)
 connect_scan_cli = connect_scan_sub.add_parser(
     "cli",
     help="Connect to a network device from the previous scan using the CLI"
