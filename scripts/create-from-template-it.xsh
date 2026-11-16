@@ -1,5 +1,6 @@
 #!/usr/bin/env xonsh
 
+# Copyright (c) 2026 MicroHobby <matheus@castello.eng.br>
 # Copyright (c) 2025 Toradex
 # SPDX-License-Identifier: MIT
 
