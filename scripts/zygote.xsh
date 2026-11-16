@@ -83,52 +83,73 @@ def _scan(args):
     _scan_list(args)
 
 
-def _connect(args):
-    if os.path.exists(f"{os.environ['HOME']}/.tcd/scan.json"):
-        with open(f"{os.environ['HOME']}/.tcd/scan.json", "r") as f:
-            nets = json.load(f)
+def __load_tcd_list(name):
+    _path = f"{os.environ['HOME']}/.tcd/{name}"
 
-        # aesthetic
-        print("")
+    if os.path.exists(_path):
+        with open(_path, "r") as f:
+            return json.load(f)
 
-        _ix = 0
-        _ip = None
-        _hostname = None
+    return []
 
-        for net in nets:
-            _ip = net["Ip"]
-            _hostname = net["Hostname"]
 
-            if _ix == args.id:
-                print(f" ➡️  {_hostname} ({_ip})")
-                break
+def __resolve_index(args, entries, list_func, action):
+    """
+    Use the index passed as argument, or list the entries and ask it
+    interactively when it was not passed. Fails if out of range.
+    """
+    _id = getattr(args, "id", None)
 
-            _ix += 1
+    if _id is None:
+        list_func(args)
+        _ix = input(f"The index of the device to {action}: ").strip()
 
-        # aesthetic
-        print("")
-
-        if _ip is not None:
-            cd $SCRIPT_PATH
-            # empty means "ask interactively" on the connect-device side,
-            # only the "connect cli" subcommand passes the credentials
-            xonsh ./connect-device.xsh \
-                @(args.id) \
-                @(getattr(args, "login", None) or "") \
-                @(getattr(args, "password", None) or "")
-            # aesthetic
-            print("")
-
-        else:
+        try:
+            _id = int(_ix)
+        except ValueError:
             Error_Out(
-                f"❌ :: Device with id [{args.id}] not found :: ❌",
-                Error.ENOFOUND
+                f"❌ :: Invalid device index [{_ix}] :: ❌",
+                Error.EINVAL
             )
-    else:
+
+    # sanity
+    if _id < 0 or _id >= len(entries):
         Error_Out(
-            "❌ :: scan list does not exists. Did you already ran the scan command? :: ❌",
+            f"❌ :: Invalid device index [{_id}] :: ❌",
+            Error.EINVAL
+        )
+
+    args.id = _id
+    return _id
+
+
+def _connect(args):
+    nets = __load_tcd_list("scan.json")
+
+    if len(nets) == 0:
+        Error_Out(
+            "❌ :: No devices in the scan list. Did you ran the scan command? :: ❌",
             Error.ENOFOUND
         )
+
+    _id = __resolve_index(args, nets, _scan_list, "connect to")
+    _ip = nets[_id]["Ip"]
+    _hostname = nets[_id]["Hostname"]
+
+    # aesthetic
+    print("")
+    print(f" ➡️  {_hostname} ({_ip})")
+    print("")
+
+    cd $SCRIPT_PATH
+    # empty means "ask interactively" on the connect-device side,
+    # only the "connect cli" subcommand passes the credentials
+    xonsh ./connect-device.xsh \
+        @(_id) \
+        @(getattr(args, "login", None) or "") \
+        @(getattr(args, "password", None) or "")
+    # aesthetic
+    print("")
 
 
 def _new(args):
@@ -236,42 +257,8 @@ def _new_cli(args):
     print("")
 
 
-def _scan_connect(args):
-    nets = []
-
-    if os.path.exists(f"{os.environ['HOME']}/.tcd/scan.json"):
-        with open(f"{os.environ['HOME']}/.tcd/scan.json", "r") as f:
-            nets = json.load(f)
-
-    if len(nets) == 0:
-        Error_Out(
-            "❌ :: No devices in the scan list. Did you ran the scan command? :: ❌",
-            Error.ENOFOUND
-        )
-
-    # only show the entries from the previous scan
-    _scan_list(args)
-
-    # get the ix
-    _ix = input("The index of the device to connect to: ")
-
-    try:
-        args.id = int(_ix)
-    except ValueError:
-        Error_Out(
-            f"❌ :: Invalid device index [{_ix}] :: ❌",
-            Error.EINVAL
-        )
-
-    _connect(args)
-
-
 def _connected_remove(args):
-    connects = []
-
-    if os.path.exists(f"{os.environ['HOME']}/.tcd/connected.json"):
-        with open(f"{os.environ['HOME']}/.tcd/connected.json", "r") as f:
-            connects = json.load(f)
+    connects = __load_tcd_list("connected.json")
 
     if len(connects) == 0:
         Error_Out(
@@ -279,12 +266,7 @@ def _connected_remove(args):
             Error.ENOFOUND
         )
 
-    # sanity
-    if args.id >= len(connects) or args.id < 0:
-        Error_Out(
-            f"❌ :: Invalid device index [{args.id}] :: ❌",
-            Error.EINVAL
-        )
+    __resolve_index(args, connects, _connected_list, "remove")
 
     _removed = connects.pop(args.id)
 
@@ -380,40 +362,23 @@ def _target_get(args):
 
 
 def _target_set(args):
-    if os.path.exists(f"{os.environ['HOME']}/.tcd/connected.json"):
-        with open(f"{os.environ['HOME']}/.tcd/connected.json", "r") as f:
-            connects = json.load(f)
+    connects = __load_tcd_list("connected.json")
 
-        # sanity
-        if args.id >= len(connects) or args.id < 0:
-            Error_Out(
-                f"❌ :: Invalid device index :: ❌",
-                Error.EINVAL
-            )
+    if len(connects) == 0:
+        Error_Out(
+            "❌ :: No devices connected. Impossible set device as target :: ❌",
+            Error.ENOFOUND
+        )
 
-        if len(connects) > 0:
-            _id = 0
-            _target = {}
+    _id = __resolve_index(args, connects, _connected_list, "set as target")
+    _target = connects[_id]
 
-            for conn in connects:
-                if _id == args.id:
-                    _target = conn
-                    break
+    with open(f"{os.environ['HOME']}/.tcd/target.json", "w") as f:
+        json.dump(_target, f)
 
-                _id += 1
-
-            with open(f"{os.environ['HOME']}/.tcd/target.json", "w") as f:
-                json.dump(_target, f)
-
-            print("🎯 :: TARGET DEVICE SET :: 🎯")
-            print(f"\t ✳️ {_target['Hostname']} ({_target['Ip']})")
-            print("")
-            return
-
-    Error_Out(
-        "❌ :: No devices connected. Impossible set device as target :: ❌",
-        Error.ETOMCRUISE
-    )
+    print("🎯 :: TARGET DEVICE SET :: 🎯")
+    print(f"\t ✳️ {_target['Hostname']} ({_target['Ip']})")
+    print("")
 
 
 def __get_target():
@@ -424,15 +389,6 @@ def __get_target():
             target = json.load(f)
 
     return target
-
-
-def _target(args):
-    _connected_list(args)
-
-    # get the ix
-    _ix = input("The index of the device to set as target: ")
-    args.id = int(_ix)
-    _target_set(args)
 
 
 def _target_console(args):
@@ -667,7 +623,7 @@ parser_target = subparser.add_parser(
     "target",
     help="Set the target device interactively"
 )
-parser_target.set_defaults(func=_target)
+parser_target.set_defaults(func=_target_set)
 parser_target_sub = parser_target.add_subparsers(title="subcommands")
 parser_target_list = parser_target_sub.add_parser(
     "get",
@@ -681,7 +637,10 @@ parser_target_set = parser_target_sub.add_parser(
 parser_target_set.add_argument(
     "id",
     type=int,
-    help="index of the network device to set as target (use the 'connected list' command to get the index)"
+    nargs="?",
+    default=None,
+    help="index of the connected device to set as target (use the 'connect list' command to get the index). " \
+         "If not passed, the connected devices are listed and the index is asked interactively"
 )
 parser_target_set.set_defaults(func=_target_set)
 parser_target_console = parser_target_sub.add_parser(
@@ -737,7 +696,7 @@ connect_scan = subparser.add_parser(
     "connect",
     help="Interactively connect to a network device from the previous scan"
 )
-connect_scan.set_defaults(func=_scan_connect)
+connect_scan.set_defaults(func=_connect)
 connect_scan_sub = connect_scan.add_subparsers(title="subcommands")
 connect_scan_list = connect_scan_sub.add_parser(
     "list",
@@ -751,7 +710,10 @@ connect_scan_remove = connect_scan_sub.add_parser(
 connect_scan_remove.add_argument(
     "id",
     type=int,
-    help="index of the connected device to remove (use the 'connect list' command to get the index)"
+    nargs="?",
+    default=None,
+    help="index of the connected device to remove (use the 'connect list' command to get the index). " \
+         "If not passed, the connected devices are listed and the index is asked interactively"
 )
 connect_scan_remove.set_defaults(func=_connected_remove)
 connect_scan_cli = connect_scan_sub.add_parser(
