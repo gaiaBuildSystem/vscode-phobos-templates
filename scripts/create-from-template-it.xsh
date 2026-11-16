@@ -18,6 +18,7 @@ $XONSH_SHOW_TRACEBACK = _TDC_DEBUG_STACK
 $XONSH_SUBPROC_CMD_RAISE_ERROR = True
 
 import os
+import re
 import sys
 import json
 from torizon_templates_utils.errors import Error,Error_Out
@@ -28,7 +29,8 @@ from torizon_templates_utils.colors import Color,BgColor,print
 # 3. ask for the project name
 # 4. ask for the project container name
 # 5. ask for the project path
-# 6. create
+# 6. ask for the template custom fields
+# 7. create
 
 # .1
 _templates = []
@@ -146,6 +148,31 @@ if os.path.exists(f"{_project_path}/{_project_name}"):
     )
 
 # .6
+# ask for the template custom fields (if any)
+_custom_fields = []
+for _cf in _template.get("customFields", []):
+    _default = _cf.get("default", "")
+    _hint = _cf.get("placeHolder", "") or _cf.get("description", "")
+    if _hint:
+        print(f"\t{_hint}")
+
+    _value = input(f"{_cf.get('label', _cf['id'])}> ")
+    if _value == "":
+        _value = _default
+
+    if not re.match(_cf.get("validRegex", "^.*$"), _value):
+        Error_Out(
+            f"❌ :: {_cf.get('errorMessage', 'Invalid value')} :: ❌",
+            Error.EINVAL
+        )
+
+    _custom_fields.append({ **_cf, "value": _value })
+
+_custom_fields_args = []
+if len(_custom_fields) > 0:
+    _custom_fields_args = ["--customFields", json.dumps(_custom_fields)]
+
+# .7
 print("🆕 Creating project...", color=Color.YELLOW)
 
 xonsh ./create-from-template.xsh \
@@ -156,6 +183,7 @@ xonsh ./create-from-template.xsh \
     @(_project_path) \
     @(_template["folder"]) \
     @(False) \
-    @(False)
+    @(False) \
+    @(_custom_fields_args)
 
 print(f"✅ Project [{_project_name}] created!", color=Color.GREEN)

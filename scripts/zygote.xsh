@@ -16,6 +16,7 @@ $XONSH_SHOW_TRACEBACK = _TDC_DEBUG_STACK
 $XONSH_SUBPROC_CMD_RAISE_ERROR = True
 
 import os
+import re
 import sys
 import json
 import subprocess
@@ -152,17 +153,51 @@ def _new_cli(args):
 
     # sanity
     # check if the template exists
-    _template_exists = False
+    _template = None
     for _t in _templates:
         if _t["folder"] == args.template:
-            _template_exists = True
+            _template = _t
             break
 
-    if not _template_exists:
+    if _template is None:
         Error_Out(
             f"❌ :: Template [{args.template}] not found :: ❌",
             Error.EINVAL
         )
+
+    # parse the --field ID=VALUE pairs
+    _field_values = {}
+    for _f in (args.field or []):
+        if "=" not in _f:
+            Error_Out(
+                f"❌ :: Invalid field [{_f}], expected the ID=VALUE format :: ❌",
+                Error.EINVAL
+            )
+        _id, _value = _f.split("=", 1)
+        _field_values[_id.strip()] = _value
+
+    # resolve and validate the template custom fields
+    _template_fields = _template.get("customFields", [])
+    _known_ids = [_cf["id"] for _cf in _template_fields]
+
+    for _id in _field_values:
+        if _id not in _known_ids:
+            Error_Out(
+                f"❌ :: Template [{args.template}] has no custom field [{_id}]. Valid fields: {', '.join(_known_ids) or 'none'} :: ❌",
+                Error.EINVAL
+            )
+
+    _custom_fields = []
+    for _cf in _template_fields:
+        _value = _field_values.get(_cf["id"], _cf.get("default", ""))
+
+        if not re.match(_cf.get("validRegex", "^.*$"), _value):
+            Error_Out(
+                f"❌ :: Custom field [{_cf['id']}] ({_cf.get('label', '')}): {_cf.get('errorMessage', 'invalid value')} :: ❌",
+                Error.EINVAL
+            )
+
+        _custom_fields.append({ **_cf, "value": _value })
 
     # if the path is empty or "." use the current working dir
     if args.path is None or args.path.strip() in ("", "."):
@@ -178,6 +213,10 @@ def _new_cli(args):
             Error.EINVAL
         )
 
+    _custom_fields_args = []
+    if len(_custom_fields) > 0:
+        _custom_fields_args = ["--customFields", json.dumps(_custom_fields)]
+
     cd $SCRIPT_PATH
     xonsh ./create-from-template.xsh \
         @(f"{os.environ['HOME']}/.apollox/{args.template}") \
@@ -187,7 +226,8 @@ def _new_cli(args):
         @(args.path) \
         @(args.template) \
         @(False) \
-        @(False)
+        @(False) \
+        @(_custom_fields_args)
 
     # aesthetic
     print("")
@@ -717,6 +757,13 @@ parser_new_cli.add_argument(
     help="Path to create the new project (empty or \".\" uses the current dir)",
     type=str,
     default="."
+)
+parser_new_cli.add_argument(
+    "--field", "-f",
+    help="Template custom field as ID=VALUE (can be used multiple times)",
+    type=str,
+    action="append",
+    default=[]
 )
 parser_new_cli.set_defaults(func=_new_cli)
 # -------------------------------------------------------------------------- NEW
