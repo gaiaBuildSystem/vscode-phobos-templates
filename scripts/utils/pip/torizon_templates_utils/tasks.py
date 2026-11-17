@@ -461,7 +461,7 @@ class TaskRunner:
                 os.environ[f"config:{key}"] = f"{value}"
 
         # also for non Torizon ones
-        for key, value in self.__settings.any.items():
+        for key, value in (self.__settings.any or {}).items():
             if isinstance(value, str) or \
                 isinstance(value, int) or \
                 isinstance(value, float):
@@ -510,9 +510,10 @@ class TaskRunner:
             raise ReferenceError(f"Task with index [{label}] not found")
 
 
-    def __replace_env_var(self, var: str, env: str):
+    def __replace_env_var(self, var: str, env: str) -> str:
         if f"${{{var}}}" in env:
             return env.replace(f"${{{var}}}", os.environ[var])
+        return env
 
 
     def __check_workspace_folder(self, env: List[str]) -> List[str]:
