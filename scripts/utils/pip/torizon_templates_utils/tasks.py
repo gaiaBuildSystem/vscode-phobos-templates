@@ -8,6 +8,8 @@ import mimetypes
 import subprocess
 from pathlib import Path
 from typing import List, Dict, Type, TypeVar, Union, Tuple, Optional, Literal
+from rich.console import Console
+from rich.markdown import Markdown
 from torizon_templates_utils.colors import print, Color
 
 T = TypeVar('T')
@@ -526,15 +528,71 @@ class TaskRunner:
         return ret
 
 
-    def __check_torizon_inputs(self, env: List[str]) -> List[str]:
+    def __check_torizon_inputs(self, env: List[str], emulate: bool = True) -> List[str]:
         ret: List[str] = []
 
         for value in env:
             if "${command:torizon_" in value:
                 value = value.replace("${command:torizon_", "${config:torizon_")
+            if "${command:torizon." in value:
+                value = self.__check_torizon_commands(value, emulate)
             ret.append(value)
 
         return ret
+
+
+    def __check_torizon_commands(self, value: str, emulate: bool = True) -> str:
+        """
+        Resolve the ${command:torizon.<name>} action commands. On VS Code
+        they are executed by the Torizon extension, outside of it we emulate
+        them here and replace the placeholder with a no-op command.
+
+        When emulate is False the command is not executed, the placeholder
+        is only replaced by the no-op command. This is used for values that
+        are parsed but not executed, like the environment variables of a
+        task, to avoid side effects on them.
+        """
+        _pattern = r"(?<=\$\{command:torizon\.).*?(?=\s*})"
+        # dict.fromkeys to keep the order and drop duplicated commands, so
+        # the same command is not executed more than once
+        _matches = dict.fromkeys(re.findall(_pattern, value))
+
+        for match in _matches:
+            if emulate:
+                if match == "openTemplateDocumentation":
+                    self.__show_template_documentation()
+                else:
+                    # do not fail the whole task, the command exists and is
+                    # valid on VS Code, we just can't emulate it here
+                    print(
+                        f"Warning: Command [torizon.{match}] is not supported "
+                        "outside VS Code and it was ignored",
+                        color=Color.YELLOW,
+                        flush=True
+                    )
+
+            # the placeholder may have spaces between the command and the
+            # closing brace, so replace it with a regex instead of a string
+            value = re.sub(
+                rf"\$\{{command:torizon\.\s*{re.escape(match)}\s*\}}",
+                "/usr/bin/echo",
+                value
+            )
+
+        return value
+
+
+    def __show_template_documentation(self) -> None:
+        # the documentation always lives at the root of the project, which
+        # may not be the current dir if the task or the caller changed it
+        _workspace = os.environ.get("workspaceFolder") or os.getcwd()
+        _doc_path = os.path.join(_workspace, ".doc", "README.md")
+
+        if not os.path.exists(_doc_path):
+            raise ReferenceError(f"Template documentation [{_doc_path}] not found")
+
+        with open(_doc_path, 'r') as f:
+            Console().print(Markdown(f.read()))
 
 
     def __check_docker_inputs(self, env: List[str]) -> List[str]:
@@ -791,7 +849,9 @@ class TaskRunner:
             if _env_value is not None:
                 expvalue = [_env_value]
                 expvalue = self.__check_workspace_folder(expvalue)
-                expvalue = self.__check_torizon_inputs(expvalue)
+                # env values are not executed, so do not emulate the torizon
+                # action commands here, just drop the placeholders
+                expvalue = self.__check_torizon_inputs(expvalue, emulate=False)
                 expvalue = self.__check_docker_inputs(expvalue)
                 expvalue = self.__check_tcb_inputs(expvalue)
                 expvalue = self.__check_input(expvalue)

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "phobos-templates-utils"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
   { name="Matheus Castello", email="matheus@castello.eng.br" },
 ]
@@ -21,7 +21,8 @@ dependencies = [
     "requests",
     "pyyaml",
     "debugpy",
-    "pkginfo>=1.12"
+    "pkginfo>=1.12",
+    "rich"
 ]
 
 [tool.setuptools]
